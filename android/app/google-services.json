@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "14521645431",
+    "project_id": "apartment-inspection",
+    "storage_bucket": "apartment-inspection.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:14521645431:android:3543872e4fe3f38df18972",
+        "android_client_info": {
+          "package_name": "com.lzs.apartmentinspection"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCu9svUqJvnA_Js_ong9_HQhuRunpV4QW8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
