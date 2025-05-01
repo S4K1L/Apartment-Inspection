@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../bottom_navbar/user_bottom_nav_bar.dart';
+
 class LoginScreen extends StatelessWidget {
   final LoginController controller = Get.put(LoginController());
 
@@ -61,7 +63,9 @@ class LoginScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 CustomAuthButton(
-                  onPress: () {},
+                  onPress: () {
+                    Get.to(()=> UserCustomBottomBar());
+                  },
                   title: "Log In",
                 ),
                 SizedBox(height: 16.sp),

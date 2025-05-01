@@ -1,13 +1,11 @@
-import 'package:apartmentinspection/models/user_model.dart';
-import 'package:apartmentinspection/utils/theme/colors.dart';
-import 'package:apartmentinspection/views/bottom_navbar/admin_bottom_nav_bar.dart';
 import 'package:apartmentinspection/views/bottom_navbar/user_bottom_nav_bar.dart';
+import 'package:apartmentinspection/utils/theme/colors.dart';
+import 'package:apartmentinspection/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 
 class RegisterController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -46,6 +44,7 @@ class RegisterController extends GetxController {
         name: nameController.text.trim(),
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
+        role: "user",
       );
 
       // Save user to Firestore
@@ -110,7 +109,6 @@ class RegisterController extends GetxController {
       );
     }
   }
-
 
   void togglePasswordVisibility() {
     isPasswordVisible.value = !isPasswordVisible.value;

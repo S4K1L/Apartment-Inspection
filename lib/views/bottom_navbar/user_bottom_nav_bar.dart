@@ -1,5 +1,5 @@
 import 'package:apartmentinspection/utils/theme/colors.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:apartmentinspection/views/home.dart';
 import 'package:flutter/material.dart';
 
 class UserCustomBottomBar extends StatefulWidget {
@@ -12,6 +12,10 @@ class UserCustomBottomBar extends StatefulWidget {
 class _BottomBarState extends State<UserCustomBottomBar> {
   int indexColor = 0;
   final List<Widget> screens = [
+    HomePage(),
+    HomePage(),
+    HomePage(),
+    HomePage(),
 
   ];
 
@@ -22,27 +26,26 @@ class _BottomBarState extends State<UserCustomBottomBar> {
         return false;
       },
       child: Scaffold(
+        backgroundColor: kWhiteColor,
         body: screens[indexColor],
         bottomNavigationBar: BottomAppBar(
           elevation: 10,
           color: kWhiteColor,
           shape: const CircularNotchedRectangle(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildBottomNavigationItem(Icons.map, 1,"Statistics"),
-                  _buildBottomNavigationItem(CupertinoIcons.lock_shield, 2, "Search"),
-                  _buildBottomNavigationItem(Icons.home, 0,"Dashboard"),
-                  _buildBottomNavigationItem(Icons.dynamic_feed, 3, "Analysis "),
-                  _buildBottomNavigationItem(Icons.person, 4, "Account"),
-                ],
-              ),
-            ],
+          child: SizedBox(
+            height: 60,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildBottomNavigationItem(Icons.home, 0, "Home"),
+                _buildBottomNavigationItem(Icons.map, 1, "Inspection"),
+                _buildBottomNavigationItem(Icons.dynamic_feed, 2, "Report"),
+                _buildBottomNavigationItem(Icons.person, 3, "Account"),
+              ],
+            ),
           ),
         ),
+
       ),
     );
   }
@@ -54,19 +57,29 @@ class _BottomBarState extends State<UserCustomBottomBar> {
           indexColor = index;
         });
       },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 30,
-            color: indexColor == index ? kPrimaryColor : kGreyColor,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: Text(title,style: TextStyle(fontWeight: FontWeight.bold,color: indexColor == index ? kPrimaryColor : kGreyColor,),),
-          ),
-        ],
+      child: Container(
+        height: 60, // Fixed height for tab
+        width: MediaQuery.of(context).size.width / 4.5,
+        color: indexColor == index ? kPrimaryColor : kWhiteColor,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 24,
+              color: indexColor == index ? kWhiteColor : kGreyColor,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                color: indexColor == index ? kWhiteColor : kGreyColor,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

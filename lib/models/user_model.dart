@@ -5,12 +5,14 @@ class UserModel {
   final String? name;
   final String? email;
   final String? password;
+  final String? role;
 
   UserModel({
     this.uid,
     this.name,
     this.email,
     this.password,
+    this.role,
   });
 
   Map<String, dynamic> toMap() {
@@ -19,6 +21,7 @@ class UserModel {
       'name': name,
       'email': email,
       'password': password,
+      'role': role,
     };
   }
 
@@ -28,6 +31,7 @@ class UserModel {
       name: doc['name'] ?? '',
       email: doc['email'] ?? '',
       password: doc['password'] ?? '',
+      role: doc['role'] ?? '',
     );
   }
 
@@ -37,6 +41,7 @@ class UserModel {
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       password: map['password'] ?? '',
+      role: map['role'] ?? '',
     );
   }
 }
