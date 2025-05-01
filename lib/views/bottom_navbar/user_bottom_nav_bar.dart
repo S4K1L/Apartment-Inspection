@@ -1,6 +1,7 @@
 import 'package:apartmentinspection/core/my_app.dart';
 import 'package:apartmentinspection/utils/theme/colors.dart';
 import 'package:apartmentinspection/views/home.dart';
+import 'package:apartmentinspection/views/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -17,7 +18,7 @@ class _BottomBarState extends State<UserCustomBottomBar> {
     HomePage(),
     HomePage(),
     HomePage(),
-    HomePage(),
+    ProfileScreen(),
   ];
 
   @override
@@ -25,7 +26,7 @@ class _BottomBarState extends State<UserCustomBottomBar> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: kWhiteColor,
+        backgroundColor: kBackGroundColor,
         body: screens[indexColor],
         bottomNavigationBar: Container(
           height: 60.sp,
@@ -54,7 +55,7 @@ class _BottomBarState extends State<UserCustomBottomBar> {
         },
         child: Container(
           height: double.infinity,
-          color: isSelected ? kPrimaryColor : kWhiteColor,
+          color: isSelected ? kPrimaryColor : kBackGroundColor,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
