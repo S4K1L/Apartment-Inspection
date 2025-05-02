@@ -1,5 +1,6 @@
 import 'package:apartmentinspection/utils/theme/colors.dart';
 import 'package:apartmentinspection/views/bottom_navbar/admin_bottom_nav_bar.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -18,7 +19,7 @@ class LoginController extends GetxController {
   var user = UserModel().obs;
 
   /// Login function
-  Future<void> login() async {
+  Future<void> login(BuildContext context) async {
     if (!_validateInputs()) return;
     isLoading.value = true;
     try {
@@ -45,7 +46,7 @@ class LoginController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.only(bottom: 30, left: 16, right: 16),
       );
-      routing();
+      routing(context);
       emailController.clear();
       passwordController.clear();
     } on FirebaseAuthException catch (e) {
@@ -107,43 +108,58 @@ class LoginController extends GetxController {
   }
 
   //routing
-  void routing() async {
+  void routing(BuildContext context) async {
     User? user = FirebaseAuth.instance.currentUser;
 
     var documentSnapshot = await FirebaseFirestore.instance.collection('users').doc(user?.uid).get();
     if (documentSnapshot.exists) {
       String userType = documentSnapshot.get('role');
       if (userType == "user") {
-        Get.snackbar(
-          'Login Success',
-          'You have successfully logged in!',
-          colorText: kWhiteColor,
-          backgroundColor: Colors.green,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.only(bottom: 30, left: 16, right: 16),
+        const snackBar = SnackBar(
+          elevation: 10,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Login Successfully',
+            message: 'Welcome to Apartment Inspection',
+            contentType: ContentType.success,
+          ),
         );
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
         Get.offAll(()=> UserCustomBottomBar());
       }
       else if (userType == "admin") {
-        Get.snackbar(
-          'Login Success',
-          'You have successfully logged in!',
-          colorText: kWhiteColor,
-          backgroundColor: Colors.green,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.only(bottom: 30, left: 16, right: 16),
+        const snackBar = SnackBar(
+          elevation: 10,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Login Successfully',
+            message: 'Welcome to Apartment Inspection',
+            contentType: ContentType.success,
+          ),
         );
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
         Get.offAll(()=> AdminCustomBottomBar());
       }
       else {
-        Get.snackbar(
-          'Try again',
-          'Some error in logging in!',
-          colorText: kWhiteColor,
-          backgroundColor: Colors.green,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.only(bottom: 30, left: 16, right: 16),
+        const snackBar = SnackBar(
+          elevation: 10,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Try again',
+            message: 'Some error in logging in!',
+            contentType: ContentType.failure,
+          ),
         );
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
       }
     }
     else {

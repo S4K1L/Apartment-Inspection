@@ -25,6 +25,7 @@ dependencies:
   flutter_localization: ^0.3.2
   flutter_local_notifications: ^19.1.0
   intl:
+  awesome_snackbar_content: ^0.1.5
 
   #<---------------------------Localization------------------------>
   flutter_localizations:

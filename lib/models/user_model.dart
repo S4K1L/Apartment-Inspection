@@ -1,17 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserModel {
-  final String? uid;
-  final String? name;
-  final String? email;
-  final String? password;
-  final String? role;
+   String? uid;
+   String? name;
+   String? email;
+   String? password;
+   String? imageUrl;
+   String? role;
 
   UserModel({
     this.uid,
     this.name,
     this.email,
     this.password,
+    this.imageUrl,
     this.role,
   });
 
@@ -21,6 +23,7 @@ class UserModel {
       'name': name,
       'email': email,
       'password': password,
+      'imageUrl': imageUrl,
       'role': role,
     };
   }
@@ -31,6 +34,7 @@ class UserModel {
       name: doc['name'] ?? '',
       email: doc['email'] ?? '',
       password: doc['password'] ?? '',
+      imageUrl: doc['imageUrl'] ?? '',
       role: doc['role'] ?? '',
     );
   }
@@ -41,6 +45,7 @@ class UserModel {
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       password: map['password'] ?? '',
+      imageUrl: map['imageUrl'] ?? '',
       role: map['role'] ?? '',
     );
   }

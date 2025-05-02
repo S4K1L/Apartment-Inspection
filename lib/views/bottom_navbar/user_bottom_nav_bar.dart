@@ -1,9 +1,10 @@
-import 'package:apartmentinspection/core/my_app.dart';
 import 'package:apartmentinspection/utils/theme/colors.dart';
-import 'package:apartmentinspection/views/home.dart';
-import 'package:apartmentinspection/views/profile.dart';
+import 'package:apartmentinspection/views/user/home.dart';
+import 'package:apartmentinspection/views/profile/profile.dart';
+import 'package:apartmentinspection/views/user/report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../user/inspection.dart';
 
 class UserCustomBottomBar extends StatefulWidget {
   const UserCustomBottomBar({super.key});
@@ -16,8 +17,8 @@ class _BottomBarState extends State<UserCustomBottomBar> {
   int indexColor = 0;
   final List<Widget> screens = [
     HomePage(),
-    HomePage(),
-    HomePage(),
+    InspectionPage(),
+    ReportPage(),
     ProfileScreen(),
   ];
 
@@ -28,7 +29,7 @@ class _BottomBarState extends State<UserCustomBottomBar> {
       child: Scaffold(
         backgroundColor: kBackGroundColor,
         body: screens[indexColor],
-        bottomNavigationBar: Container(
+        bottomNavigationBar: SizedBox(
           height: 60.sp,
           child: Row(
             children: [

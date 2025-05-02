@@ -45,6 +45,7 @@ class RegisterController extends GetxController {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
         role: "user",
+        imageUrl: "",
       );
 
       // Save user to Firestore

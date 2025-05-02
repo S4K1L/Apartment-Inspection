@@ -1,4 +1,4 @@
-import 'package:apartmentinspection/views/authentication/login.dart';
+import 'package:apartmentinspection/views/authentication/auth_gate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Apartment Inspection',
-          home: LoginScreen(),
+          home: AuthGate(),
           supportedLocales: const [
             Locale('en'), // English
             Locale('fr'), // French

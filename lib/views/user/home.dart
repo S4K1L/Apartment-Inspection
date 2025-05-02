@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final List<String> apartmentNumbers =
-  List.generate(5, (index) => "Apartment #${index + 1}");
+  List.generate(1205, (index) => "${index + 1200}");
 
   bool _isLoading = false;
 
@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(width: 8.sp),
           Image.asset(Const.logo),
           SizedBox(width: 8.sp),
-          Text("PREV1200",
+          Text("APARTMENT",
               style:
               TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold)),
           const Spacer(),
@@ -68,9 +68,7 @@ class _HomePageState extends State<HomePage> {
                 return GestureDetector(
                   onTap: () {},
                   child: ApartmentCard(
-                    title: apartmentNumbers[index],
-                    description: "Apartment description",
-                    price: "1360",
+                    roomNumber: apartmentNumbers[index],
                   ),
                 );
               },
