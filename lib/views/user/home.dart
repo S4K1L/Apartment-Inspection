@@ -1,39 +1,16 @@
 import 'dart:ui';
-
-import 'package:apartmentinspection/core/my_app.dart';
+import 'package:apartmentinspection/controller/apartment_controller.dart';
+import 'package:apartmentinspection/utils/components/custom_search_bar.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
 import 'package:apartmentinspection/utils/theme/colors.dart';
 import 'package:apartmentinspection/utils/widgets/apartment_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
+  final ApartmentController controller = Get.put(ApartmentController());
   HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final List<String> apartmentNumbers =
-  List.generate(1205, (index) => "${index + 1200}");
-
-  bool _isLoading = false;
-
-  Future<void> _refreshData() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 2));
-
-    // You can also update apartment list here if needed
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,8 +23,7 @@ class _HomePageState extends State<HomePage> {
           Image.asset(Const.logo),
           SizedBox(width: 8.sp),
           Text("APARTMENT",
-              style:
-              TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold)),
           const Spacer(),
           Image.asset(Const.bar, height: 26.sp),
           SizedBox(width: 8.sp),
@@ -56,23 +32,39 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
           _buildBackground(),
-          RefreshIndicator(
-            onRefresh: _refreshData,
-            displacement: 50,
-            color: kPrimaryColor,
-            backgroundColor: Colors.white,
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: apartmentNumbers.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {},
-                  child: ApartmentCard(
-                    roomNumber: apartmentNumbers[index],
-                  ),
-                );
-              },
-            ),
+          Column(
+            children: [
+              CustomSearchBar(controller: controller),
+              Expanded(
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (controller.filteredList.isEmpty) {
+                    return const Center(child: Text("No apartments found."));
+                  }
+                  return RefreshIndicator(
+                    onRefresh: () async => controller.fetchApartments(),
+                    color: kPrimaryColor,
+                    backgroundColor: Colors.white,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: controller.filteredList.length,
+                      itemBuilder: (context, index) {
+                        final apartment = controller.filteredList[index];
+                        return GestureDetector(
+                          onTap: () {},
+                          child: ApartmentCard(
+                            number: apartment.number ?? '',
+                            unit: apartment.unit ?? '',
+                            apartmentName: apartment.apartmentName ?? '',
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }),
+              ),
+            ],
           ),
         ],
       ),
@@ -95,3 +87,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+

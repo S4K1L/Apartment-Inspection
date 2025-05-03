@@ -38,14 +38,6 @@ class LoginController extends GetxController {
         }
       }
       isLoading.value = false;
-      Get.snackbar(
-        'Login Success',
-        'You have successfully logged in!',
-        colorText: kWhiteColor,
-        backgroundColor: kPrimaryColor,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.only(bottom: 30, left: 16, right: 16),
-      );
       routing(context);
       emailController.clear();
       passwordController.clear();

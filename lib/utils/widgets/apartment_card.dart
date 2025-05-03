@@ -1,21 +1,23 @@
-import 'package:apartmentinspection/core/my_app.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
 import 'package:apartmentinspection/views/user/apartment/inspection_form.dart';
+import 'package:apartmentinspection/views/user/apartment/room_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class ApartmentCard extends StatelessWidget {
-  final String roomNumber;
+  final String apartmentName;
+  final String number;
+  final String unit;
   const ApartmentCard({
     super.key,
-    required this.roomNumber,
+    required this.number, required this.unit, required this.apartmentName,
   });
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        Get.to(()=> InspectionFormPage(location: roomNumber,),transition: Transition.rightToLeft);
+        Get.to(()=> RoomListPage(apartmentNumber: number,apartmentUnit: unit,apartmentName: apartmentName,),transition: Transition.rightToLeft);
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 10),
@@ -73,7 +75,15 @@ class ApartmentCard extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  roomNumber,
+                                  number,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24.sp,
+                                  ),
+                                ),
+                                Text(
+                                  unit,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -100,7 +110,7 @@ class ApartmentCard extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(left: 20.sp),
                   child: Text(
-                    'INSPECTION',
+                    apartmentName.toUpperCase(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14.sp,
