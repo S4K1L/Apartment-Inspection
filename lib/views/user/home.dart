@@ -51,13 +51,10 @@ class HomePage extends StatelessWidget {
                       itemCount: controller.filteredList.length,
                       itemBuilder: (context, index) {
                         final apartment = controller.filteredList[index];
-                        return GestureDetector(
-                          onTap: () {},
-                          child: ApartmentCard(
-                            number: apartment.number ?? '',
-                            unit: apartment.unit ?? '',
-                            apartmentName: apartment.apartmentName ?? '',
-                          ),
+                        return ApartmentCard(
+                          number: apartment.apartmentNumber ?? '',
+                          unit: apartment.apartmentUnit ?? '',
+                          apartmentName: apartment.apartmentName ?? '',
                         );
                       },
                     ),

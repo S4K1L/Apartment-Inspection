@@ -36,8 +36,8 @@ class ApartmentController extends GetxController {
     } else {
       final q = query.toLowerCase();
       filteredList.value = apartmentList.where((apartment) {
-        return apartment.number.toLowerCase().contains(q) ||
-            apartment.unit.toLowerCase().contains(q) || apartment.apartmentName.toLowerCase().contains(q);
+        return apartment.apartmentNumber.toLowerCase().contains(q) ||
+            apartment.apartmentUnit.toLowerCase().contains(q) || apartment.apartmentName.toLowerCase().contains(q);
       }).toList();
     }
   }

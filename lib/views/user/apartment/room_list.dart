@@ -89,7 +89,7 @@ class _RoomListPageState extends State<RoomListPage> {
               apartmentNumber: widget.apartmentNumber,
               apartmentUnit: widget.apartmentUnit,
               apartmentName: widget.apartmentName,
-            ));
+            ),transition: Transition.rightToLeft);
 
           },
           title: "Suivante",

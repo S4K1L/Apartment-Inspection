@@ -1,74 +1,150 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:signature/signature.dart';
 
 class InspectionFormController extends GetxController {
-  final commentController = ''.obs;
-  final dateController = ''.obs;
+  final commentController = TextEditingController();
+  final dateController = TextEditingController();
+  final interventionLevelController = TextEditingController();
+
+  var selectedInterventionLevel = 'Observation'.obs;
   final pickedImage = Rx<File?>(null);
+  final selectedImages = <File>[].obs;
 
   final isLoading = false.obs;
 
   final Map<String, List<Map<String, dynamic>>> roomEntries = {};
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final selectedImages = <File>[].obs;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
   final ImagePicker _picker = ImagePicker();
+
+  void setInterventionLevel(String level) {
+    selectedInterventionLevel.value = level;
+  }
 
   Future<void> pickImages() async {
     final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles.isNotEmpty) {
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
       selectedImages.addAll(pickedFiles.map((e) => File(e.path)));
     }
   }
 
   void removeImage(int index) {
-    selectedImages.removeAt(index);
+    if (index >= 0 && index < selectedImages.length) {
+      selectedImages.removeAt(index);
+    }
   }
 
-  Future<String> uploadImage(File imageFile) async {
-    final ref = FirebaseStorage.instance
-        .ref('reports/${DateTime.now().millisecondsSinceEpoch}.jpg');
+  Future<String?> uploadImage(File? imageFile) async {
+    if (imageFile == null) return null;
+    final ref = _storage.ref('reports/${DateTime.now().millisecondsSinceEpoch}.jpg');
     final uploadTask = await ref.putFile(imageFile);
     return await uploadTask.ref.getDownloadURL();
   }
 
-  Future<void> addRoomEntry(String roomName) async {
-    if (commentController.value.isEmpty || pickedImage.value == null) {
-      Get.snackbar("Error", "Comment and image are required for the room");
+  Future<void> addRoomEntry(
+      String roomName, {
+        required String? apartmentNumber,
+        required String? apartmentUnit,
+        required String? apartmentName,
+      }) async {
+    if (commentController.text.isEmpty) {
+      Get.snackbar("Error", "Comment is required for the room");
       return;
     }
 
-    final imageUrl = await uploadImage(pickedImage.value!);
+    try {
+      isLoading.value = true;
 
-    final entry = {
-      'comment': commentController.value,
-      'imageUrl': imageUrl,
-    };
+      final imageUrl = await uploadImage(pickedImage.value);
+      final entry = {
+        'comment': commentController.text,
+        'interventionLevel': selectedInterventionLevel.value,
+        'imageUrl': imageUrl ?? '',
+        'date': dateController.text,
+      };
 
-    if (roomEntries.containsKey(roomName)) {
-      roomEntries[roomName]!.add(entry);
-    } else {
-      roomEntries[roomName] = [entry];
+      final query = await _firestore
+          .collection('reports')
+          .where('apartmentNumber', isEqualTo: apartmentNumber)
+          .where('apartmentUnit', isEqualTo: apartmentUnit)
+          .limit(1)
+          .get();
+
+      if (query.docs.isEmpty) {
+        // Create a new report
+        await _firestore.collection('reports').add({
+          'apartmentNumber': apartmentNumber,
+          'apartmentUnit': apartmentUnit,
+          'apartmentName': apartmentName,
+          'inspectionDate': dateController.text,
+          'createdAt': Timestamp.now(),
+          'rooms': [
+            {
+              'roomName': roomName,
+              'entries': [entry],
+            }
+          ],
+          'inspectionStatus': 'Pending',
+        });
+      } else {
+        // Update existing report
+        final doc = query.docs.first;
+        final docRef = _firestore.collection('reports').doc(doc.id);
+        final rooms = List<Map<String, dynamic>>.from(doc['rooms'] ?? []);
+
+        final roomIndex = rooms.indexWhere((room) => room['roomName'] == roomName);
+        if (roomIndex != -1) {
+          // Append entry to existing room
+          List<Map<String, dynamic>> entries =
+          List<Map<String, dynamic>>.from(rooms[roomIndex]['entries'] ?? []);
+          entries.add(entry);
+          rooms[roomIndex]['entries'] = entries;
+        } else {
+          // Add new room with this entry
+          rooms.add({
+            'roomName': roomName,
+            'entries': [entry],
+          });
+        }
+
+        await docRef.update({
+          'rooms': rooms,
+          'updatedAt': Timestamp.now(),
+        });
+      }
+
+      // Track local state
+      roomEntries.putIfAbsent(roomName, () => []).add(entry);
+
+      // Reset fields
+      commentController.clear();
+      dateController.clear();
+      pickedImage.value = null;
+
+      Get.snackbar("Room Saved", "Added entry to $roomName");
+    } catch (e) {
+      Get.snackbar("Error", "Failed to add room entry: $e");
+    } finally {
+      isLoading.value = false;
     }
-
-    commentController.value = '';
-    pickedImage.value = null;
-
-    Get.snackbar("Room Saved", "Added entry to $roomName");
   }
 
+
   Future<void> submitReport({
-    required String apartmentNumber,
-    required String apartmentUnit,
-    required String apartmentName,
+    required String? apartmentNumber,
+    required String? apartmentUnit,
+    required String? apartmentName,
     Map<String, String>? signatureUrls,
   }) async {
-    if (dateController.value.isEmpty || roomEntries.isEmpty) {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (dateController.text.isEmpty || roomEntries.isEmpty) {
       Get.snackbar("Error", "Please select a date and add at least one room");
       return;
     }
@@ -76,7 +152,7 @@ class InspectionFormController extends GetxController {
     try {
       isLoading.value = true;
 
-      final List<Map<String, dynamic>> newRoomList = roomEntries.entries.map((entry) {
+      final newRoomList = roomEntries.entries.map((entry) {
         return {
           'roomName': entry.key,
           'entries': entry.value,
@@ -116,7 +192,8 @@ class InspectionFormController extends GetxController {
           'apartmentNumber': apartmentNumber,
           'apartmentUnit': apartmentUnit,
           'apartmentName': apartmentName,
-          'inspectionDate': dateController.value,
+          'inspectedBy': user!.uid,
+          'inspectionDate': dateController.text,
           'createdAt': Timestamp.now(),
           'rooms': newRoomList,
           if (signatureUrls != null) ...{
@@ -128,8 +205,8 @@ class InspectionFormController extends GetxController {
 
       roomEntries.clear();
       selectedImages.clear();
-      commentController.value = '';
-      dateController.value = '';
+      commentController.clear();
+      dateController.clear();
 
       Get.snackbar("Success", "Inspection report submitted");
     } catch (e) {
@@ -140,13 +217,14 @@ class InspectionFormController extends GetxController {
   }
 
   Future<void> uploadSignaturesAndSubmit({
-    required SignatureController technicianController,
-    required SignatureController clientController,
-    required String apartmentNumber,
-    required String apartmentUnit,
-    required String apartmentName,
+    required SignatureController? technicianController,
+    required SignatureController? clientController,
+    required String? apartmentNumber,
+    required String? apartmentUnit,
+    required String? apartmentName,
   }) async {
-    if (!technicianController.isNotEmpty || !clientController.isNotEmpty) {
+    if (!(technicianController?.isNotEmpty ?? false) ||
+        !(clientController?.isNotEmpty ?? false)) {
       Get.snackbar("Error", "Please complete both signatures.");
       return;
     }
@@ -154,7 +232,6 @@ class InspectionFormController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Restrict: Only 1 report per apartment per month
       final now = DateTime.now();
       final startOfMonth = DateTime(now.year, now.month, 1);
       final endOfMonth = DateTime(now.year, now.month + 1, 0);
@@ -173,15 +250,13 @@ class InspectionFormController extends GetxController {
         return;
       }
 
-      Uint8List? techData = await technicianController.toPngBytes();
-      Uint8List? clientData = await clientController.toPngBytes();
+      final techData = await technicianController?.toPngBytes();
+      final clientData = await clientController?.toPngBytes();
 
       if (techData == null || clientData == null) throw "Signature conversion failed";
 
-      final techRef = FirebaseStorage.instance
-          .ref('signatures/${apartmentNumber}_${apartmentUnit}_technician.png');
-      final clientRef = FirebaseStorage.instance
-          .ref('signatures/${apartmentNumber}_${apartmentUnit}_client.png');
+      final techRef = _storage.ref('signatures/${apartmentNumber}_${apartmentUnit}_technician.png');
+      final clientRef = _storage.ref('signatures/${apartmentNumber}_${apartmentUnit}_client.png');
 
       await techRef.putData(techData);
       await clientRef.putData(clientData);

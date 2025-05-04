@@ -28,6 +28,14 @@ dependencies:
   awesome_snackbar_content: ^0.1.5
   image_picker: ^1.1.2
   signature:
+  pdf: ^3.11.3
+  printing: ^5.14.2
+  google_fonts: ^6.2.1
+  permission_handler: ^12.0.0+1
+  widgets_to_image: ^1.0.0
+  syncfusion_flutter_pdfviewer:
+  path_provider:
+  flutter_slidable:
 
   #<---------------------------Localization------------------------>
   flutter_localizations:
@@ -46,6 +54,7 @@ flutter:
   assets:
      - assets/images/
      - assets/icons/
+     - assets/fonts/Roboto-Regular.ttf
 
   #<---------------------------Font Assets------------------------>
   # fonts:

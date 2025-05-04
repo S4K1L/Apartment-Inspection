@@ -4,7 +4,7 @@ import 'package:apartmentinspection/views/profile/profile.dart';
 import 'package:apartmentinspection/views/user/report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../user/inspection.dart';
+import '../user/sensor.dart';
 
 class UserCustomBottomBar extends StatefulWidget {
   const UserCustomBottomBar({super.key});
@@ -17,7 +17,7 @@ class _BottomBarState extends State<UserCustomBottomBar> {
   int indexColor = 0;
   final List<Widget> screens = [
     HomePage(),
-    InspectionPage(),
+    SensorPage(),
     ReportPage(),
     ProfileScreen(),
   ];
@@ -34,7 +34,7 @@ class _BottomBarState extends State<UserCustomBottomBar> {
           child: Row(
             children: [
               _buildBottomNavigationItem(Icons.home, 0, "Home"),
-              _buildBottomNavigationItem(Icons.map, 1, "Inspection"),
+              _buildBottomNavigationItem(Icons.sensors_sharp, 1, "Sensor"),
               _buildBottomNavigationItem(Icons.dynamic_feed, 2, "Report"),
               _buildBottomNavigationItem(Icons.person, 3, "Account"),
             ],

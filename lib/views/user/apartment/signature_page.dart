@@ -61,6 +61,7 @@ class _SignaturePageState extends State<SignaturePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: kBackGroundColor,
       appBar: AppBar(
         backgroundColor: kWhiteColor,
         automaticallyImplyLeading: false,
@@ -129,6 +130,9 @@ class _SignaturePageState extends State<SignaturePage> {
                   ),
                 ],
               ),
+              const SizedBox(height: 8),
+              Text("Date de validation de la visite",style: TextStyle(fontSize: 18.sp,fontWeight: FontWeight.w500,color: kBlackColor),),
+              Text("Date of validation of the visit",style: TextStyle(fontSize: 16.sp,fontWeight: FontWeight.w300,color: kGreyColor),),
             ],
           );
         }),
