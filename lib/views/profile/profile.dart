@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:apartmentinspection/controller/profile_controller.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
 import 'package:apartmentinspection/utils/theme/colors.dart';
@@ -19,17 +20,20 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: kBackGroundColor,
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildHeader(),
-            SizedBox(height: 20.h),
-            _buildStats(),
-            SizedBox(height: 20.h),
-            _buildShortBio(context),
-            SizedBox(height: 20.h),
-            _buildButtons(context),
-            SizedBox(height: 30.h),
-          ],
+        child: Bounce(
+          duration: Duration(milliseconds: 700),
+          child: Column(
+            children: [
+              _buildHeader(),
+              SizedBox(height: 20.h),
+              _buildStats(),
+              SizedBox(height: 20.h),
+              _buildShortBio(context),
+              SizedBox(height: 20.h),
+              _buildButtons(context),
+              SizedBox(height: 30.h),
+            ],
+          ),
         ),
       ),
     );
@@ -43,7 +47,7 @@ class ProfileScreen extends StatelessWidget {
           height: 260.h,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF00BCD4), Color(0xFF009688)],
+              colors: [Color(0xFF0C2A69), Color(0xFF132D46)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -94,15 +98,25 @@ class ProfileScreen extends StatelessWidget {
                         height: 50.sp,
                         width: 120.sp,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(32),
-                                bottomRight: Radius.circular(32)),
-                            color: kPrimaryColor),
+                          borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(32),
+                              bottomRight: Radius.circular(32)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              blurRadius: 8.sp,
+                              offset: Offset(3, 5),
+                            ),
+                          ],
+                          border: Border.all(color: kWhiteColor, width: 2),
+                          color: kPrimaryColor,
+                        ),
                         child: Center(
                           child: Text(
                             "Edit Profile",
                             style: TextStyle(
                               color: kWhiteColor,
+                              fontWeight: FontWeight.bold,
                               fontSize: 16.sp,
                             ),
                           ),
@@ -161,11 +175,19 @@ class ProfileScreen extends StatelessWidget {
         child: Container(
             height: 50.sp,
             width: double.infinity,
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    bottomRight: Radius.circular(32)),
-                color: kPrimaryColor),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(32),
+                  bottomRight: Radius.circular(32)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.indigo.withOpacity(0.4),
+                  blurRadius: 8.sp,
+                  offset: Offset(0, 5),
+                ),
+              ],
+              color: kPrimaryColor,
+            ),
             child: Center(
               child: Text(
                 "Logout",
@@ -197,26 +219,6 @@ class ProfileScreen extends StatelessWidget {
     return Column(
       children: [
         _profileTile(
-          () => showDeleteConfirmationDialog(
-            context,
-            "Clear Cache",
-            "Are you sure you want to Clear Cache? This action is irreversible.",
-            () {},
-          ),
-          Icons.auto_delete,
-          "Clear Cache",
-        ),
-        _profileTile(
-          () => showDeleteConfirmationDialog(
-            context,
-            "Clear History",
-            "Are you sure you want to Clear History? This action is irreversible.",
-            () {},
-          ),
-          Icons.history,
-          "Clear History",
-        ),
-        _profileTile(
             () => showDeleteConfirmationDialog(
                   context,
                   "Delete Account",
@@ -229,6 +231,11 @@ class ProfileScreen extends StatelessWidget {
             Icons.delete_outline_rounded,
             "Delete Account",
             iconColor: Colors.red),
+        _profileTile(() {
+          Get.to(() => TermsAndPolicyPage(),
+              transition: Transition.rightToLeft);
+        }, Icons.sensors_sharp, "Sensor Management History", iconColor: Colors.black),
+
       ],
     );
   }

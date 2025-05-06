@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:apartmentinspection/controller/register_controller.dart';
 import 'package:apartmentinspection/utils/components/custom_auth_button.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
@@ -39,64 +40,70 @@ class RegisterScreen extends StatelessWidget {
                   () => Skeletonizer(
                       enabled: controller.isLoading.value,
                       enableSwitchAnimation: true,
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 30),
-                          buildTextField(
-                              controller.nameController, 'nom / Name'),
-                          const SizedBox(height: 16),
-                          buildTextField(
-                              controller.emailController, 'E-Mail / Email'),
-                          const SizedBox(height: 16),
-                          buildPasswordField(controller.passwordController,
-                              'Mot de passe / Password'),
-                          const SizedBox(height: 24),
-                          CustomAuthButton(
-                            onPress: controller.register,
-                            title: "Register",
-                          ),
-                          SizedBox(height: 16.sp),
-                          Center(
-                            child: TextButton(
-                                onPressed: () {
-                                  Get.to(() => LoginScreen(),
-                                      transition: Transition.rightToLeft);
-                                },
-                                child: const Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Already have an account? ",
-                                      style: TextStyle(color: kWhiteColor),
-                                    ),
-                                    Text(
-                                      "Login here ",
-                                      style: TextStyle(color: kSecondaryColor),
-                                    ),
-                                  ],
-                                )),
-                          )
-                        ],
+                      child: BounceInRight(
+                        duration: Duration(milliseconds: 700),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 30),
+                            buildTextField(
+                                controller.nameController, 'nom / Name'),
+                            const SizedBox(height: 16),
+                            buildTextField(
+                                controller.emailController, 'E-Mail / Email'),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: controller.passwordController,
+                              obscureText: !controller.isPasswordVisible.value,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                labelText: 'Mot de passe / Password',
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                suffixIcon: IconButton(
+                                  onPressed: controller.togglePasswordVisibility,
+                                  icon: Icon(
+                                    controller.isPasswordVisible.value
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            CustomAuthButton(
+                              onPress: controller.register,
+                              title: "Register",
+                            ),
+                            SizedBox(height: 16.sp),
+                            Center(
+                              child: TextButton(
+                                  onPressed: () {
+                                    Get.to(() => LoginScreen(),
+                                        transition: Transition.leftToRight);
+                                  },
+                                  child: const Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Already have an account? ",
+                                        style: TextStyle(color: kWhiteColor),
+                                      ),
+                                      Text(
+                                        "Login here ",
+                                        style: TextStyle(color: kSecondaryColor),
+                                      ),
+                                    ],
+                                  )),
+                            )
+                          ],
+                        ),
                       )),
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  TextField buildPasswordField(TextEditingController controller, String label) {
-    return TextField(
-      controller: controller,
-      obscureText: true,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }

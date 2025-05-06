@@ -54,25 +54,32 @@ class _BottomBarState extends State<UserCustomBottomBar> {
             indexColor = index;
           });
         },
-        child: Container(
-          height: double.infinity,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeIn,
           color: isSelected ? kPrimaryColor : kBackGroundColor,
+          padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                size: 24,
-                color: isSelected ? kWhiteColor : kGreyColor,
+              AnimatedScale(
+                scale: isSelected ? 1.2 : 1.0,
+                duration: const Duration(milliseconds: 300),
+                child: Icon(
+                  icon,
+                  size: 24,
+                  color: isSelected ? kWhiteColor : kGreyColor,
+                ),
               ),
               const SizedBox(height: 4),
-              Text(
-                title,
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 300),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
                   color: isSelected ? kWhiteColor : kGreyColor,
                 ),
+                child: Text(title),
               ),
             ],
           ),
@@ -80,4 +87,6 @@ class _BottomBarState extends State<UserCustomBottomBar> {
       ),
     );
   }
+
+
 }

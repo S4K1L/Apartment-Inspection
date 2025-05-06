@@ -36,6 +36,7 @@ dependencies:
   syncfusion_flutter_pdfviewer:
   path_provider:
   flutter_slidable:
+  animate_do: ^4.2.0
 
   #<---------------------------Localization------------------------>
   flutter_localizations:

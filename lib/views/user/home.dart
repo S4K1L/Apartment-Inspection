@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:animate_do/animate_do.dart';
 import 'package:apartmentinspection/controller/apartment_controller.dart';
 import 'package:apartmentinspection/utils/components/custom_search_bar.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
@@ -32,36 +33,39 @@ class HomePage extends StatelessWidget {
       body: Stack(
         children: [
           _buildBackground(),
-          Column(
-            children: [
-              CustomSearchBar(controller: controller),
-              Expanded(
-                child: Obx(() {
-                  if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (controller.filteredList.isEmpty) {
-                    return const Center(child: Text("No apartments found."));
-                  }
-                  return RefreshIndicator(
-                    onRefresh: () async => controller.fetchApartments(),
-                    color: kPrimaryColor,
-                    backgroundColor: Colors.white,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: controller.filteredList.length,
-                      itemBuilder: (context, index) {
-                        final apartment = controller.filteredList[index];
-                        return ApartmentCard(
-                          number: apartment.apartmentNumber ?? '',
-                          unit: apartment.apartmentUnit ?? '',
-                          apartmentName: apartment.apartmentName ?? '',
-                        );
-                      },
-                    ),
-                  );
-                }),
-              ),
-            ],
+          Bounce(
+            duration: const Duration(milliseconds: 700),
+            child: Column(
+              children: [
+                CustomSearchBar(controller: controller),
+                Expanded(
+                  child: Obx(() {
+                    if (controller.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (controller.filteredList.isEmpty) {
+                      return const Center(child: Text("No apartments found."));
+                    }
+                    return RefreshIndicator(
+                      onRefresh: () async => controller.fetchApartments(),
+                      color: kPrimaryColor,
+                      backgroundColor: Colors.white,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: controller.filteredList.length,
+                        itemBuilder: (context, index) {
+                          final apartment = controller.filteredList[index];
+                          return ApartmentCard(
+                            number: apartment.apartmentNumber ?? '',
+                            unit: apartment.apartmentUnit ?? '',
+                            apartmentName: apartment.apartmentName ?? '',
+                          );
+                        },
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
           ),
         ],
       ),

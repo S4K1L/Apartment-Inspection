@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:apartmentinspection/controller/login_controller.dart';
 import 'package:apartmentinspection/utils/components/custom_auth_button.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
@@ -33,68 +34,87 @@ class LoginScreen extends StatelessWidget {
                   () => Skeletonizer(
                     enabled: controller.isLoading.value,
                     enableSwitchAnimation: true,
-                    child: Column(
-                      children: [
-                        const Text(
-                          'Connexion / Log In',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
+                    child: BounceInLeft(
+                      duration: const Duration(milliseconds: 700),
+                      child: Column(
+                        children: [
+                          const Text(
+                            'Connexion / Log In',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 30),
-                        TextField(
-                          controller: controller.emailController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white,
-                            labelText: 'E-Mail / Email',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8)),
+                          const SizedBox(height: 30),
+                          TextField(
+                            controller: controller.emailController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              labelText: 'E-Mail / Email',
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextField(
+                          const SizedBox(height: 16),
+                        TextFormField(
                           controller: controller.passwordController,
-                          obscureText: true,
+                          obscureText: !controller.isPasswordVisible.value,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white,
                             labelText: 'Mot de passe / Password',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8)),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        CustomAuthButton(
-                          onPress: () => controller.login(context),
-                          title: "Log In",
-                        ),
-                        SizedBox(height: 16.sp),
-                        Center(
-                          child: TextButton(
-                            onPressed: () {
-                              Get.to(() => RegisterScreen(),
-                                  transition: Transition.rightToLeft);
-                            },
-                            child: const Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Don't have an account? ",
-                                  style: TextStyle(color: kWhiteColor),
-                                ),
-                                Text(
-                                  "Register here ",
-                                  style: TextStyle(color: kSecondaryColor),
-                                ),
-                              ],
+                            suffixIcon: IconButton(
+                              onPressed: controller.togglePasswordVisibility,
+                              icon: Icon(
+                                controller.isPasswordVisible.value
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
                             ),
                           ),
+                          validator: (val) {
+                            if (val!.isEmpty) {
+                              return "Please enter the password";
+                            } else if (val.length <= 6) {
+                              return "Password should be 6 characters or more";
+                            }
+                            return null;
+                          },
                         ),
-                      ],
+                          const SizedBox(height: 24),
+                          CustomAuthButton(
+                            onPress: () => controller.login(context),
+                            title: "Log In",
+                          ),
+                          SizedBox(height: 16.sp),
+                          Center(
+                            child: TextButton(
+                              onPressed: () {
+                                Get.to(() => RegisterScreen(),
+                                    transition: Transition.rightToLeft);
+                              },
+                              child: const Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Don't have an account? ",
+                                    style: TextStyle(color: kWhiteColor),
+                                  ),
+                                  Text(
+                                    "Register here ",
+                                    style: TextStyle(color: kSecondaryColor),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -106,3 +126,4 @@ class LoginScreen extends StatelessWidget {
     );
   }
 }
+
