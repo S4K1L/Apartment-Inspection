@@ -27,4 +27,14 @@ class ApartmentModel {
       'apartmentName': apartmentName,
     };
   }
-}
+
+  factory ApartmentModel.fromFirestore(Map<String, dynamic> data, String docId) {
+    return ApartmentModel(
+      id: docId,
+      apartmentName: data['apartmentName'] ?? '',
+      apartmentNumber: data['apartmentNumber'] ?? '',
+      apartmentUnit: data['apartmentUnit'] ?? '',
+    );
+  }
+
+  }

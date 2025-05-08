@@ -31,7 +31,6 @@ class SensorDetailPage extends StatelessWidget {
       ),
       body: Obx(() {
         final updatedUnit = controller.sensorUnits[index];
-
         return BounceInRight(
           child: Padding(
             padding: EdgeInsets.all(16.r),
@@ -61,7 +60,7 @@ class SensorDetailPage extends StatelessWidget {
                 ),
                 SizedBox(height: 20.h),
           
-                Text("Sensor Status",
+                Text("Batteries",
                     style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500)),
                 SizedBox(height: 10.h),
           

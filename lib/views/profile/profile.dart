@@ -6,6 +6,8 @@ import 'package:apartmentinspection/views/comapny_details/about_us.dart';
 import 'package:apartmentinspection/views/comapny_details/contact_admin.dart';
 import 'package:apartmentinspection/views/comapny_details/terms_and_policy.dart';
 import 'package:apartmentinspection/views/profile/edit_profile.dart';
+import 'package:apartmentinspection/views/user/battery/battery_history_page.dart';
+import 'package:apartmentinspection/views/user/battery/history_apartment_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -232,7 +234,7 @@ class ProfileScreen extends StatelessWidget {
             "Delete Account",
             iconColor: Colors.red),
         _profileTile(() {
-          Get.to(() => TermsAndPolicyPage(),
+          Get.to(() => SensorHistoryPage(),
               transition: Transition.rightToLeft);
         }, Icons.sensors_sharp, "Sensor Management History", iconColor: Colors.black),
 
