@@ -156,18 +156,6 @@ class SensorPage extends StatelessWidget {
                                     ],
                                   ),
                                   SizedBox(height: 6.h),
-                                  Text(
-                                    "Last Update: ${unit.lastUpdate?.toLocal()
-                                        .toIso8601String()
-                                        .split('T')[0] ?? '-'}",
-                                    style: TextStyle(
-                                      color: isReminderDue ? Colors.red : Colors
-                                          .white,
-                                      fontWeight: isReminderDue
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),

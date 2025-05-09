@@ -23,7 +23,7 @@ class UserModel {
       'name': name,
       'email': email,
       'password': password,
-      'imageUrl': imageUrl,
+      'imageUrl': imageUrl ?? '',
       'role': role,
     };
   }

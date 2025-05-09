@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../models/user_model.dart';
+import '../utils/theme/colors.dart';
 import '../views/authentication/login.dart';
 
 class ProfileController extends GetxController {
@@ -122,8 +128,7 @@ class ProfileController extends GetxController {
 
         // Delete Firebase Auth account
         await user!.delete();
-
-        Get.offAllNamed('/login'); // Navigate back to login
+        Get.offAll(()=> LoginScreen());
         Get.snackbar("Account Deleted", "Your account has been permanently deleted.");
       }
     } catch (e) {
@@ -131,5 +136,77 @@ class ProfileController extends GetxController {
       // Note: Firebase requires recent login for sensitive operations
     }
   }
+
+
+  Future<int> getTotalUserReports() async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) return 0;
+
+    try {
+      final reportsSnapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('reports')
+          .get();
+
+      return reportsSnapshot.size;
+    } catch (e) {
+      print("Error fetching reports: $e");
+      return 0;
+    }
+  }
+
+
+  Future<int> getTotalUsers() async {
+    try {
+      final usersSnapshot = await _firestore.collection('users').get();
+      return usersSnapshot.size;
+    } catch (e) {
+      print("Error counting users: $e");
+      return 0;
+    }
+  }
+
+  Future<void> pickAndUploadUserImage() async {
+    try {
+      final picker = ImagePicker();
+      final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) return;
+
+      Get.dialog(
+        const Center(child: SpinKitWave(
+          color: kPrimaryColor,
+          size: 50.0,
+        ),),
+        barrierDismissible: false,
+      );
+
+      File imageFile = File(pickedFile.path);
+      String userId = FirebaseAuth.instance.currentUser!.uid;
+      String fileName = 'profile_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('user_images')
+          .child(userId)
+          .child(fileName);
+
+      UploadTask uploadTask = ref.putFile(imageFile);
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'imageUrl': downloadUrl});
+
+      await fetchLoggedInUser();
+    } catch (e) {
+      print('Error uploading image: $e');
+    } finally {
+      Get.back(); // dismiss dialog
+    }
+  }
+
 
 }

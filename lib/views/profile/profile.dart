@@ -9,32 +9,47 @@ import 'package:apartmentinspection/views/profile/edit_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '../user/battery_history/battery_history_page.dart';
 
-class ProfileScreen extends StatelessWidget {
-  final ProfileController controller = Get.put(ProfileController());
-
+class ProfileScreen extends StatefulWidget {
   ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final ProfileController controller = Get.put(ProfileController());
+  int reportCount = 0;
+  int users = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
+    reportCount = await controller.getTotalUserReports();
+    users = await controller.getTotalUsers();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackGroundColor,
       body: SingleChildScrollView(
-        child: Bounce(
-          duration: Duration(milliseconds: 700),
-          child: Column(
-            children: [
-              _buildHeader(),
-              SizedBox(height: 20.h),
-              _buildStats(),
-              SizedBox(height: 20.h),
-              _buildShortBio(context),
-              SizedBox(height: 20.h),
-              _buildButtons(context),
-              SizedBox(height: 30.h),
-            ],
-          ),
+        child: Column(
+          children: [
+            _buildHeader(),
+            SizedBox(height: 16.h), // space below header's Stack
+            _buildStats(reportCount, users),
+            SizedBox(height: 20.h),
+            _buildShortBio(context),
+            SizedBox(height: 30.h),
+            _buildButtons(context),
+            SizedBox(height: 30.h),
+          ],
         ),
       ),
     );
@@ -60,57 +75,88 @@ class ProfileScreen extends StatelessWidget {
         ),
         Positioned(
           top: 100.h,
-          left: 40.h,
-          right: 0,
+          left: 30.w,
+          right: 30.w,
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CircleAvatar(
-                radius: 60.sp,
-                backgroundColor: kWhiteColor,
-                backgroundImage: controller.user.value.imageUrl!.isNotEmpty
-                    ? NetworkImage(controller.user.value.imageUrl.toString())
-                    : const AssetImage(
-                        Const.profile,
-                      ),
-              ),
-              SizedBox(width: 10.h),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
+              Stack(
                 children: [
-                  Text(
-                    controller.user.value.name.toString(),
-                    style: TextStyle(
+                  Obx(() => CircleAvatar(
+                    radius: 50.sp,
+                    backgroundColor: kWhiteColor,
+                    backgroundImage: (controller.user.value.imageUrl != null &&
+                        controller.user.value.imageUrl!.isNotEmpty)
+                        ? NetworkImage(controller.user.value.imageUrl!)
+                        : const AssetImage(Const.profile) as ImageProvider,
+                  )),
+                  Positioned(
+                    bottom: 0,
+                    right: 4,
+                    child: GestureDetector(
+                      onTap: () async {
+                        await controller.pickAndUploadUserImage();
+                        await controller.fetchLoggedInUser();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: kPrimaryColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: kWhiteColor, width: 2),
+                        ),
+                        child: const Icon(
+                          Icons.edit,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: 20.w),
+              Obx(() => Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      controller.user.value.name ?? "User Name",
+                      style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                  Text(
-                    controller.user.value.email.toString(),
-                    style: TextStyle(fontSize: 14.sp, color: Colors.white70),
-                  ),
-                  SizedBox(height: 16.h),
-                  GestureDetector(
-                    onTap: () {
-                      Get.to(() => EditProfilePage(),
-                          transition: Transition.rightToLeft);
-                    },
-                    child: Container(
-                        height: 50.sp,
-                        width: 120.sp,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      controller.user.value.email ?? "user@email.com",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    GestureDetector(
+                      onTap: () => Get.to(() => EditProfilePage(),
+                          transition: Transition.rightToLeft),
+                      child: Container(
+                        height: 40.h,
+                        width: 120.w,
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(32),
-                              bottomRight: Radius.circular(32)),
+                            bottomRight: Radius.circular(32),
+                            topLeft: Radius.circular(32),
+                          ),
+                          color: kPrimaryColor,
+                          border: Border.all(color: kWhiteColor, width: 2),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.3),
-                              blurRadius: 8.sp,
-                              offset: Offset(3, 5),
+                              blurRadius: 6.r,
+                              offset: const Offset(2, 4),
                             ),
                           ],
-                          border: Border.all(color: kWhiteColor, width: 2),
-                          color: kPrimaryColor,
                         ),
                         child: Center(
                           child: Text(
@@ -118,28 +164,31 @@ class ProfileScreen extends StatelessWidget {
                             style: TextStyle(
                               color: kWhiteColor,
                               fontWeight: FontWeight.bold,
-                              fontSize: 16.sp,
+                              fontSize: 14.sp,
                             ),
                           ),
-                        )),
-                  ),
-                ],
-              ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
             ],
           ),
-        )
+        ),
       ],
     );
   }
 
-  Widget _buildStats() {
+
+  Widget _buildStats(int reportCount, int users) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 40.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _statItem("Report", "120"),
-          _statItem("Inspection", "06"),
+          _statItem("Reports", "$reportCount"),
+          _statItem("Users", "$users"),
         ],
       ),
     );
@@ -172,29 +221,31 @@ class ProfileScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () => controller.logout(context),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 26.sp),
+        padding: EdgeInsets.symmetric(horizontal: 26.w),
         child: Container(
-            height: 50.sp,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  bottomRight: Radius.circular(32)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.indigo.withOpacity(0.4),
-                  blurRadius: 8.sp,
-                  offset: Offset(0, 5),
-                ),
-              ],
-              color: kPrimaryColor,
+          height: 50.h,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(32),
+              bottomRight: Radius.circular(32),
             ),
-            child: Center(
-              child: Text(
-                "Logout",
-                style: TextStyle(color: kWhiteColor, fontSize: 16.sp),
+            color: kPrimaryColor,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.indigo.withOpacity(0.4),
+                blurRadius: 8.r,
+                offset: Offset(0, 5),
               ),
-            )),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              "Logout",
+              style: TextStyle(color: kWhiteColor, fontSize: 16.sp),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -204,14 +255,13 @@ class ProfileScreen extends StatelessWidget {
       children: [
         _profileTile(() {
           Get.to(() => AboutUsPage(), transition: Transition.rightToLeft);
-        }, Icons.abc_outlined, "About us", iconColor: kBlackColor),
+        }, Icons.info_outline, "About Us"),
         _profileTile(() {
           Get.to(() => ContactUsPage(), transition: Transition.rightToLeft);
-        }, Icons.admin_panel_settings_outlined, "Contact Us"),
+        }, Icons.support_agent, "Contact Us"),
         _profileTile(() {
-          Get.to(() => TermsAndPolicyPage(),
-              transition: Transition.rightToLeft);
-        }, Icons.policy, "Terms & Policy", iconColor: Colors.black),
+          Get.to(() => TermsAndPolicyPage(), transition: Transition.rightToLeft);
+        }, Icons.policy_outlined, "Terms & Policy"),
       ],
     );
   }
@@ -220,23 +270,19 @@ class ProfileScreen extends StatelessWidget {
     return Column(
       children: [
         _profileTile(
-            () => showDeleteConfirmationDialog(
-                  context,
-                  "Delete Account",
-                  "Are you sure you want to delete your account? This action is irreversible.",
-                  () {
-                    Get.back();
-                    controller.deleteUserAccount();
-                  },
-                ),
-            Icons.delete_outline_rounded,
+              () => showDeleteConfirmationDialog(
+            context,
             "Delete Account",
-            iconColor: Colors.red),
-        _profileTile(() {
-          Get.to(() => SensorHistoryPage(),
-              transition: Transition.rightToLeft);
-        }, Icons.sensors_sharp, "Sensor Management History", iconColor: Colors.black),
-
+            "Are you sure you want to delete your account? This action is irreversible.",
+                () {
+              Get.back();
+              controller.deleteUserAccount();
+            },
+          ),
+          Icons.delete_outline,
+          "Delete Account",
+          iconColor: Colors.red,
+        ),
       ],
     );
   }
@@ -252,7 +298,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void showDeleteConfirmationDialog(BuildContext context, String title,
-      String middleText, VoidCallback onPress) {
+      String middleText, VoidCallback onConfirm) {
     Get.defaultDialog(
       title: title,
       middleText: middleText,
@@ -260,7 +306,7 @@ class ProfileScreen extends StatelessWidget {
       textConfirm: "YES",
       confirmTextColor: Colors.white,
       buttonColor: Colors.red,
-      onConfirm: onPress,
+      onConfirm: onConfirm,
     );
   }
 }
