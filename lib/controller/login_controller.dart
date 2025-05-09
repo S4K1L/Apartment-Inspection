@@ -11,6 +11,7 @@ import '../views/bottom_navbar/user_bottom_nav_bar.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
+  final forgotEmailController = TextEditingController();
   final passwordController = TextEditingController();
   var isLoading = false.obs;
   final isPasswordVisible = false.obs;
@@ -159,10 +160,27 @@ class LoginController extends GetxController {
     }
   }
 
-  Future<void> resetPassword(String email) async {
+  Future<void> resetPassword(BuildContext context) async {
+    isLoading.value = true;
+    String email = forgotEmailController.text;
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      const snackBar = SnackBar(
+        elevation: 10,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Reset Successful',
+          message: 'Check your mail to reset password',
+          contentType: ContentType.success,
+        ),
+      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+      isLoading.value = false;
     } catch (error) {
+      isLoading.value = false;
       if (kDebugMode) {
         print('Error resetting password: $error');
       }

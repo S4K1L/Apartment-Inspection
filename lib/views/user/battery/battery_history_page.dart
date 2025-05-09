@@ -1,48 +1,188 @@
+import 'dart:ui';
+
+import 'package:animate_do/animate_do.dart';
+import 'package:apartmentinspection/core/my_app.dart';
+import 'package:apartmentinspection/utils/constant/const.dart';
+import 'package:apartmentinspection/utils/theme/colors.dart';
 import 'package:apartmentinspection/views/user/battery/battery_history_details_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../controller/battery_history_controller.dart';
 
 class SensorHistoryPage extends StatelessWidget {
-  final controller = Get.put(ApartmentHistoryController());
+  final controller = Get.put(BatteryHistoryController());
 
   SensorHistoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    controller.fetchApartments();  // Fetch apartments with valid sensor history
+    controller.fetchApartments();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select Apartment'),
-        backgroundColor: Colors.blue.shade800,
-      ),
-      body: Obx(() {
-        final apartments = controller.apartments;
-        if (apartments.isEmpty) {
-          return const Center(child: Text('No apartment history found.'));
-        }
+      backgroundColor: kBackGroundColor,
+      body: Column(
+        children: [
+          Container(
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(28.r),
+                bottomRight: Radius.circular(28.r),
+              ),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF0C2A69), Color(0xFF132D46)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            padding: EdgeInsets.fromLTRB(16.w, 48.h, 16.w, 16.h),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Battery History",
+                  style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold, color: kWhiteColor),
+                ),
+                SizedBox(height: 12.h),
+                // Search bar
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: TextField(
+                      onChanged: controller.searchFilter,
+                      style: TextStyle(fontSize: 16.sp, color: Colors.black87),
+                      decoration: InputDecoration(
+                        hintText: "Search here",
+                        hintStyle: TextStyle(color: Colors.grey.shade600),
+                        prefixIcon: const Icon(Icons.search, color: Colors.black54),
+                        filled: true,
+                        fillColor: Colors.transparent,
+                        contentPadding: EdgeInsets.symmetric(vertical: 14.h),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Obx(() {
+            final apartments = controller.filteredApartments; // <== Use filtered list
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: apartments.length,
-          itemBuilder: (context, index) {
-            final unit = apartments[index].apartmentUnit;
-            return Card(
-              elevation: 4,
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: ListTile(
-                title: Text('Apartment Unit: $unit'),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {
-                  Get.to(() => SensorHistoryDetailPage(apartmentUnit: unit));
-                },
+            if (controller.isLoading.value) {
+              return const Expanded(
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            return Expanded(
+              child: RefreshIndicator(
+                onRefresh: () => controller.fetchApartments(),
+                color: kPrimaryColor,
+                child: BounceInRight(
+                  duration: const Duration(milliseconds: 700),
+                  child: Skeletonizer(
+                    enabled: controller.isLoading.value,
+                    enableSwitchAnimation: true,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                      itemCount: apartments.length,
+                      itemBuilder: (context, index) {
+                        final apartment = apartments[index];
+
+                        return GestureDetector(
+                          onTap: () {
+                            controller.fetchSensorHistory(apartment.apartmentUnit);
+                            Get.to(
+                                  () => SensorHistoryDetailPage(apartmentUnit: apartment.apartmentUnit),
+                              transition: Transition.rightToLeft,
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.indigo.shade700, Colors.indigo.shade800],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  offset: Offset(0, 6),
+                                  blurRadius: 10,
+                                )
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 100,
+                                  width: 100,
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      bottomLeft: Radius.circular(20),
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                  child: Image.asset(Const.battery, fit: BoxFit.contain),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${apartment.apartmentName} ${apartment.apartmentNumber} (${apartment.apartmentUnit})",
+                                          style: TextStyle(
+                                            fontSize: 18.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          "Tap to view sensor history",
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.white70,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(right: 16),
+                                  child: Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
               ),
             );
-          },
-        );
-      }),
+          })
+
+
+        ],
+      ),
     );
   }
 }

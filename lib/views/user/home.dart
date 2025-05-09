@@ -11,7 +11,9 @@ import 'package:get/get.dart';
 
 class HomePage extends StatelessWidget {
   final ApartmentController controller = Get.put(ApartmentController());
+
   HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,6 +71,22 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: kPrimaryColor
+        ),
+        child: IconButton(
+          onPressed: () {},
+          icon: Icon(
+            Icons.add,
+            color: kWhiteColor,
+            size: 32,
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
     );
   }
 
@@ -88,4 +106,3 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-

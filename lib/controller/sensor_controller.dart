@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SensorController extends GetxController {
   var sensorUnits = <SensorUnit>[].obs;
+  var allSensorUnits = <SensorUnit>[].obs; // Store all units
+
 
   @override
   void onInit() {
@@ -39,6 +41,7 @@ class SensorController extends GetxController {
         }
       }
 
+      allSensorUnits.assignAll(allUnits);
       sensorUnits.assignAll(allUnits);
     } catch (e) {
       print('Error fetching sensor data: $e');
@@ -126,4 +129,18 @@ class SensorController extends GetxController {
       return diff >= 0 && diff <= 30;
     }).toList();
   }
+
+  void searchFilter(String query) {
+    if (query.isEmpty) {
+      sensorUnits.value = allSensorUnits;
+    } else {
+      sensorUnits.value = allSensorUnits
+          .where((unit) =>
+      unit.apartmentName!.toLowerCase().contains(query.toLowerCase()) ||
+          unit.apartmentNumber!.toLowerCase().contains(query.toLowerCase()) ||
+          unit.apartmentUnit!.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+  }
+
 }

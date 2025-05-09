@@ -7,6 +7,8 @@ class Const{
   static const String apartment = "$imagePath/apartment.png";
   static const String apart = "$imagePath/apart.jpg";
   static const String profile = "$imagePath/profile.png";
+  static const String battery = "$imagePath/battery.png";
+  static const String report = "$imagePath/Report.png";
 
   //icons path
 static const String iconPath = "assets/icons";

@@ -1,7 +1,9 @@
 import 'package:apartmentinspection/utils/theme/colors.dart';
+import 'package:apartmentinspection/views/user/battery/battery_history_page.dart';
 import 'package:apartmentinspection/views/user/home.dart';
 import 'package:apartmentinspection/views/profile/profile.dart';
 import 'package:apartmentinspection/views/user/report.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../user/sensor.dart';
@@ -17,7 +19,8 @@ class _BottomBarState extends State<UserCustomBottomBar> {
   int indexColor = 0;
   final List<Widget> screens = [
     HomePage(),
-    SensorPage(),
+    BatteryPage(),
+    SensorHistoryPage(),
     ReportPage(),
     ProfileScreen(),
   ];
@@ -33,10 +36,11 @@ class _BottomBarState extends State<UserCustomBottomBar> {
           height: 60.sp,
           child: Row(
             children: [
+              _buildBottomNavigationItem(CupertinoIcons.battery_full, 1, "Battery"),
+              _buildBottomNavigationItem(Icons.history_toggle_off, 2, "History"),
               _buildBottomNavigationItem(Icons.home, 0, "Home"),
-              _buildBottomNavigationItem(Icons.sensors_sharp, 1, "Sensor"),
-              _buildBottomNavigationItem(Icons.dynamic_feed, 2, "Report"),
-              _buildBottomNavigationItem(Icons.person, 3, "Account"),
+              _buildBottomNavigationItem(Icons.dynamic_feed, 3, "Report"),
+              _buildBottomNavigationItem(Icons.person, 4, "Account"),
             ],
           ),
         ),

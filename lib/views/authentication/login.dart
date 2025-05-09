@@ -9,6 +9,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+import 'forgot_password.dart';
+
 class LoginScreen extends StatelessWidget {
   final LoginController controller = Get.put(LoginController());
 
@@ -85,7 +87,20 @@ class LoginScreen extends StatelessWidget {
                             return null;
                           },
                         ),
-                          const SizedBox(height: 24),
+
+                          Align(
+                              alignment: Alignment.topRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  Get.to(() => ForgotPassword(),
+                                      transition: Transition.rightToLeft);
+                                },
+                                child:const Text(
+                                  "Forgot Password ? ",
+                                  style: TextStyle(color: kWhiteColor),
+                                ),
+                              ),),
+                          const SizedBox(height: 16),
                           CustomAuthButton(
                             onPress: () => controller.login(context),
                             title: "Log In",
