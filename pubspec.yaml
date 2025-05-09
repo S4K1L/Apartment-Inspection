@@ -37,7 +37,8 @@ dependencies:
   path_provider:
   flutter_slidable:
   animate_do: ^4.2.0
-  flutter_speed_dial:
+  flutter_spinkit: ^5.2.1
+  mailer:
 
   #<---------------------------Localization------------------------>
   flutter_localizations:

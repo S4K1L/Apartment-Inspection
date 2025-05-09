@@ -5,6 +5,7 @@ import 'package:apartmentinspection/utils/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:printing/printing.dart';
 
@@ -73,7 +74,10 @@ class ReportPage extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: SpinKitWave(
+                    color: kPrimaryColor,
+                    size: 50.0,
+                  ),);
                 }
 
                 if (controller.reports.isEmpty) {

@@ -54,13 +54,68 @@ class ReportController extends GetxController {
       clientSignature = await networkImageToBytes(report['signatures']['client']);
     }
 
+    // Preload all room entry images
+    final roomWidgets = <pw.Widget>[];
+    for (var room in report['rooms']) {
+      final entryWidgets = <pw.Widget>[];
+
+      for (var entry in room['entries']) {
+        Uint8List? imageBytes;
+        if (entry['imageUrl'] != null) {
+          try {
+            imageBytes = await networkImageToBytes(entry['imageUrl']);
+          } catch (_) {
+            // Fail silently if image fails to load
+          }
+        }
+
+        entryWidgets.add(
+          pw.Container(
+            margin: const pw.EdgeInsets.only(bottom: 8),
+            child: pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  'Date: ${entry['date']}\nLevel: ${entry['interventionLevel']}\nComment: ${entry['comment']}',
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
+                if (imageBytes != null) ...[
+                  pw.Spacer(),
+                  pw.Image(pw.MemoryImage(imageBytes), height: 150,width: 150),
+                  pw.SizedBox(width: 10),
+                ],
+              ],
+            ),
+          ),
+        );
+      }
+
+      roomWidgets.add(
+        pw.Container(
+          margin: const pw.EdgeInsets.symmetric(vertical: 5),
+          padding: const pw.EdgeInsets.all(8),
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: PdfColors.grey400),
+            borderRadius: pw.BorderRadius.circular(4),
+          ),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(room['roomName'], style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              ...entryWidgets,
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Now safe to build the PDF synchronously
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         theme: pw.ThemeData.withFont(base: ttf),
         build: (context) {
           return [
-            // Top banner with logo
             pw.Container(
               color: PdfColors.blue200,
               padding: const pw.EdgeInsets.all(12),
@@ -69,30 +124,31 @@ class ReportController extends GetxController {
                 children: [
                   pw.Text(
                     'Apartment Inspection Report',
-                    style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+                    style: pw.TextStyle(
+                      fontSize: 18,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.white,
+                    ),
                   ),
                   pw.Image(pw.MemoryImage(logo.buffer.asUint8List()), width: 50),
                 ],
               ),
             ),
             pw.SizedBox(height: 10),
-
-            // Main title and subtitle
             pw.Center(
               child: pw.Column(
                 children: [
-                  pw.Text('${report['apartmentName']} : ${report['apartmentNumber']} - ${report['apartmentUnit']}', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-                  pw.Text('Covers summary, rooms, schedule and comments', style: pw.TextStyle(fontSize: 10)),
+                  pw.Text('${report['apartmentName']} : ${report['apartmentNumber']} - ${report['apartmentUnit']}',
+                      style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                  pw.Text('Covers summary, rooms, schedule and comments',
+                      style: pw.TextStyle(fontSize: 10)),
                 ],
               ),
             ),
             pw.SizedBox(height: 20),
-
-            // Two-column layout
             pw.Row(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                // Left column
                 pw.Expanded(
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -101,10 +157,7 @@ class ReportController extends GetxController {
                     ],
                   ),
                 ),
-
                 pw.SizedBox(width: 20),
-
-                // Right column
                 pw.Expanded(
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -118,60 +171,46 @@ class ReportController extends GetxController {
               ],
             ),
             pw.SizedBox(height: 20),
-
-            // Room entries
             pw.Text('Room Inspections', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
-            ...List<pw.Widget>.from((report['rooms'] as List).map((room) {
-              return pw.Container(
-                margin: const pw.EdgeInsets.symmetric(vertical: 5),
-                padding: const pw.EdgeInsets.all(8),
-                decoration: pw.BoxDecoration(
-                  border: pw.Border.all(color: PdfColors.grey400),
-                  borderRadius: pw.BorderRadius.circular(4),
-                ),
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text(room['roomName'], style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    ...List<pw.Widget>.from((room['entries'] as List).map((entry) {
-                      return pw.Bullet(
-                        text: 'Date: ${entry['date']}\nLevel: ${entry['interventionLevel']}\nComment: ${entry['comment']}',
-                        style: const pw.TextStyle(fontSize: 10),
-                      );
-                    })),
-                  ],
-                ),
-              );
-            })),
-
-            // Signatures
+            ...roomWidgets,
             if (techSignature != null || clientSignature != null)
-              pw.Column(
+              pw.Row(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  pw.SizedBox(height: 20),
-                  pw.Text("Signatures", style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
-                  pw.SizedBox(height: 10),
-                  if (techSignature != null)
-                    pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Text("Technician:"),
-                        pw.Image(pw.MemoryImage(techSignature), height: 50),
-                      ],
-                    ),
-                  if (clientSignature != null)
-                    pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.SizedBox(height: 10),
-                        pw.Text("Client:"),
-                        pw.Image(pw.MemoryImage(clientSignature), height: 50),
-                      ],
-                    ),
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.SizedBox(height: 20),
+                      pw.Text("Signatures", style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                      pw.SizedBox(height: 10),
+                      if (techSignature != null)
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text("Technician :"),
+                            pw.SizedBox(height: 10),
+                            pw.Image(pw.MemoryImage(techSignature), height: 50),
+                          ],
+                        ),
+                    ]
+                  ),
+                  pw.Spacer(),
+                  pw.Column(
+                    children: [
+                      if (clientSignature != null)
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.SizedBox(height: 40),
+                            pw.Text("Client :"),
+                            pw.SizedBox(height: 10),
+                            pw.Image(pw.MemoryImage(clientSignature), height: 50),
+                          ],
+                        ),
+                    ]
+                  ),
                 ],
               ),
-
             pw.SizedBox(height: 20),
             pw.Divider(),
             pw.Center(
@@ -187,6 +226,7 @@ class ReportController extends GetxController {
 
     return pdf.save();
   }
+
 
 // Helper for info blocks
   pw.Widget _infoCard(String title, String value) {

@@ -5,8 +5,10 @@ import 'package:apartmentinspection/utils/components/custom_search_bar.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
 import 'package:apartmentinspection/utils/theme/colors.dart';
 import 'package:apartmentinspection/utils/widgets/apartment_card.dart';
+import 'package:apartmentinspection/views/user/create_apartment/create_apartment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatelessWidget {
@@ -43,7 +45,10 @@ class HomePage extends StatelessWidget {
                 Expanded(
                   child: Obx(() {
                     if (controller.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(child: SpinKitWave(
+                        color: kPrimaryColor,
+                        size: 50.0,
+                      ),);
                     } else if (controller.filteredList.isEmpty) {
                       return const Center(child: Text("No apartments found."));
                     }
@@ -77,8 +82,10 @@ class HomePage extends StatelessWidget {
           color: kPrimaryColor
         ),
         child: IconButton(
-          onPressed: () {},
-          icon: Icon(
+          onPressed: () {
+            Get.to(()=> CreateSensorPage(),transition: Transition.rightToLeft);
+          },
+          icon: const Icon(
             Icons.add,
             color: kWhiteColor,
             size: 32,

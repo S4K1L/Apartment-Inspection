@@ -12,4 +12,11 @@ class Const{
 
   //icons path
 static const String iconPath = "assets/icons";
+
+// smtp server
+static const String smtpUsername = "apartmentinspection@gmail.com";
+static const String smtpPassword = "ouhj uqec suum xwcf";
+
+
+
 }

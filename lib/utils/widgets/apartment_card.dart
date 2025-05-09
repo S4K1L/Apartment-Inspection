@@ -1,5 +1,4 @@
 import 'package:apartmentinspection/utils/constant/const.dart';
-import 'package:apartmentinspection/views/user/apartment/inspection_form.dart';
 import 'package:apartmentinspection/views/user/apartment/room_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

@@ -5,15 +5,15 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../controller/battery_history_controller.dart';
 
-class SensorHistoryDetailPage extends StatelessWidget {
+class BatteryHistoryDetailPage extends StatelessWidget {
   final String apartmentUnit;
-  SensorHistoryDetailPage({super.key, required this.apartmentUnit});
+  BatteryHistoryDetailPage({super.key, required this.apartmentUnit});
   final BatteryHistoryController controller = Get.put(BatteryHistoryController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6F8),
+      backgroundColor: kBackGroundColor,
       body: Column(
         children: [
           Container(
@@ -36,7 +36,7 @@ class SensorHistoryDetailPage extends StatelessWidget {
                     onPressed: () {
                       Get.back();
                     },
-                    icon: Icon(Icons.arrow_back_ios, color: kWhiteColor)),
+                    icon: const Icon(Icons.arrow_back_ios, color: kWhiteColor)),
                 Text(
                   "Battery Details",
                   style: TextStyle(
@@ -78,6 +78,7 @@ class SensorHistoryDetailPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    color: Colors.indigo.shade900,
                     child: Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
@@ -88,10 +89,9 @@ class SensorHistoryDetailPage extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Colors.teal,
+                              color: kWhiteColor,
                             ),
                           ),
-                          const SizedBox(height: 16),
                           GridView.count(
                             crossAxisCount: 3,
                             shrinkWrap: true,

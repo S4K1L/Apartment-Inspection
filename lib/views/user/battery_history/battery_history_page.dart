@@ -1,15 +1,13 @@
-import 'dart:ui';
-
 import 'package:animate_do/animate_do.dart';
-import 'package:apartmentinspection/core/my_app.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
 import 'package:apartmentinspection/utils/theme/colors.dart';
-import 'package:apartmentinspection/views/user/battery/battery_history_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../controller/battery_history_controller.dart';
+import 'battery_history_details_page.dart';
 
 class SensorHistoryPage extends StatelessWidget {
   final controller = Get.put(BatteryHistoryController());
@@ -79,7 +77,10 @@ class SensorHistoryPage extends StatelessWidget {
 
             if (controller.isLoading.value) {
               return const Expanded(
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(child: SpinKitWave(
+                  color: kPrimaryColor,
+                  size: 50.0,
+                ),),
               );
             }
 
@@ -102,7 +103,7 @@ class SensorHistoryPage extends StatelessWidget {
                           onTap: () {
                             controller.fetchSensorHistory(apartment.apartmentUnit);
                             Get.to(
-                                  () => SensorHistoryDetailPage(apartmentUnit: apartment.apartmentUnit),
+                                  () => BatteryHistoryDetailPage(apartmentUnit: apartment.apartmentUnit),
                               transition: Transition.rightToLeft,
                             );
                           },

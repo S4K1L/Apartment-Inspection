@@ -1,10 +1,12 @@
 import 'package:apartmentinspection/models/sensor_model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SensorController extends GetxController {
   var sensorUnits = <SensorUnit>[].obs;
   var allSensorUnits = <SensorUnit>[].obs; // Store all units
+  final observationController = TextEditingController();
 
 
   @override
@@ -66,12 +68,6 @@ class SensorController extends GetxController {
     sensorUnits[unitIndex] = unit.copyWith(sensorStatus: newStatus);
   }
 
-  // 2. Update observations
-  void updateObservation(int unitIndex, String text) {
-    final unit = sensorUnits[unitIndex];
-    sensorUnits[unitIndex] = unit.copyWith(observations: text);
-  }
-
   // 2 & 3. Save updates, set isDone=true, lastUpdate=now, then create a null sensor doc
   Future<void> saveSensorData(int index) async {
     try {
@@ -82,6 +78,7 @@ class SensorController extends GetxController {
       final updatedUnit = unit.copyWith(
         isDone: true,
         lastUpdate: now,
+        observations: observationController.text,
       );
 
       // Update current document
@@ -91,27 +88,6 @@ class SensorController extends GetxController {
           .collection("sensor")
           .doc(monthKey)
           .set(updatedUnit.toMap());
-
-      // 3. Create blank copy for next month
-      final blankStatus = List.filled(unit.totalSensors ?? 14, false);
-
-      final blankUnit = unit.copyWith(
-        sensorStatus: blankStatus,
-        observations: null,
-        isDone: false,
-        lastUpdate: null,
-      );
-
-      final nextMonth = DateTime(now.year, now.month + 1, 1);
-      final nextMonthKey =
-          "${nextMonth.year}-${nextMonth.month.toString().padLeft(2, '0')}";
-
-      await FirebaseFirestore.instance
-          .collection("apartments")
-          .doc(unit.apartmentUnit)
-          .collection("sensor")
-          .doc(nextMonthKey)
-          .set(blankUnit.toMap());
 
       Get.snackbar("Success", "Sensor data updated");
       fetchFromFirebase();
@@ -141,6 +117,14 @@ class SensorController extends GetxController {
           unit.apartmentUnit!.toLowerCase().contains(query.toLowerCase()))
           .toList();
     }
+  }
+
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    observationController.clear();
   }
 
 }

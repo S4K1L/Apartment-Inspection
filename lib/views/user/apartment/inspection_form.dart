@@ -74,6 +74,7 @@ class InspectionFormPage extends StatelessWidget {
         child: FinishedButton(
           onPress: () {
             controller.addRoomEntry(roomName,apartmentNumber: apartmentNumber, apartmentUnit: apartmentUnit, apartmentName: apartmentName);
+            Get.back();
           },
           title: "Suivante",
         ),

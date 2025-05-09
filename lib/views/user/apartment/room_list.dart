@@ -90,7 +90,6 @@ class _RoomListPageState extends State<RoomListPage> {
               apartmentUnit: widget.apartmentUnit,
               apartmentName: widget.apartmentName,
             ),transition: Transition.rightToLeft);
-
           },
           title: "Suivante",
         ),

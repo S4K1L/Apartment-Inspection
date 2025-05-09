@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -12,9 +11,8 @@ class InspectionFormController extends GetxController {
   final commentController = TextEditingController();
   final dateController = TextEditingController();
   final interventionLevelController = TextEditingController();
-
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   var selectedInterventionLevel = 'Observation'.obs;
-  final pickedImage = Rx<File?>(null);
   final selectedImages = <File>[].obs;
 
   final isLoading = false.obs;
@@ -43,7 +41,7 @@ class InspectionFormController extends GetxController {
 
   Future<String?> uploadImage(File? imageFile) async {
     if (imageFile == null) return null;
-    final ref = _storage.ref('reports/${DateTime.now().millisecondsSinceEpoch}.jpg');
+    final ref = _storage.ref('reports/${DateTime.now().millisecondsSinceEpoch}.png');
     final uploadTask = await ref.putFile(imageFile);
     return await uploadTask.ref.getDownloadURL();
   }
@@ -62,7 +60,9 @@ class InspectionFormController extends GetxController {
     try {
       isLoading.value = true;
 
-      final imageUrl = await uploadImage(pickedImage.value);
+      final imageToUpload = selectedImages.isNotEmpty ? selectedImages.first : null;
+      final imageUrl = await uploadImage(imageToUpload);
+
       final entry = {
         'comment': commentController.text,
         'interventionLevel': selectedInterventionLevel.value,
@@ -101,13 +101,11 @@ class InspectionFormController extends GetxController {
 
         final roomIndex = rooms.indexWhere((room) => room['roomName'] == roomName);
         if (roomIndex != -1) {
-          // Append entry to existing room
           List<Map<String, dynamic>> entries =
           List<Map<String, dynamic>>.from(rooms[roomIndex]['entries'] ?? []);
           entries.add(entry);
           rooms[roomIndex]['entries'] = entries;
         } else {
-          // Add new room with this entry
           rooms.add({
             'roomName': roomName,
             'entries': [entry],
@@ -126,7 +124,7 @@ class InspectionFormController extends GetxController {
       // Reset fields
       commentController.clear();
       dateController.clear();
-      pickedImage.value = null;
+      selectedImages.clear();
 
       Get.snackbar("Room Saved", "Added entry to $roomName");
     } catch (e) {
@@ -136,7 +134,6 @@ class InspectionFormController extends GetxController {
     }
   }
 
-
   Future<void> submitReport({
     required String? apartmentNumber,
     required String? apartmentUnit,
@@ -144,6 +141,7 @@ class InspectionFormController extends GetxController {
     Map<String, String>? signatureUrls,
   }) async {
     User? user = FirebaseAuth.instance.currentUser;
+
     if (dateController.text.isEmpty || roomEntries.isEmpty) {
       Get.snackbar("Error", "Please select a date and add at least one room");
       return;
@@ -192,7 +190,7 @@ class InspectionFormController extends GetxController {
           'apartmentNumber': apartmentNumber,
           'apartmentUnit': apartmentUnit,
           'apartmentName': apartmentName,
-          'inspectedBy': user!.uid,
+          'inspectedBy': user?.uid,
           'inspectionDate': dateController.text,
           'createdAt': Timestamp.now(),
           'rooms': newRoomList,
@@ -203,6 +201,7 @@ class InspectionFormController extends GetxController {
         });
       }
 
+      // Reset local state
       roomEntries.clear();
       selectedImages.clear();
       commentController.clear();
@@ -236,7 +235,7 @@ class InspectionFormController extends GetxController {
       final startOfMonth = DateTime(now.year, now.month, 1);
       final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
-      final existingQuery = await _firestore
+      final query = await _firestore
           .collection('reports')
           .where('apartmentNumber', isEqualTo: apartmentNumber)
           .where('apartmentUnit', isEqualTo: apartmentUnit)
@@ -245,15 +244,19 @@ class InspectionFormController extends GetxController {
           .limit(1)
           .get();
 
-      if (existingQuery.docs.isNotEmpty) {
-        Get.snackbar("Notice", "This apartment has already been inspected this month.");
+      if (query.docs.isEmpty) {
+        Get.snackbar("Error", "No report found for this apartment this month.");
         return;
       }
+
+      final reportDoc = query.docs.first.reference;
 
       final techData = await technicianController?.toPngBytes();
       final clientData = await clientController?.toPngBytes();
 
-      if (techData == null || clientData == null) throw "Signature conversion failed";
+      if (techData == null || clientData == null) {
+        throw "Signature conversion failed";
+      }
 
       final techRef = _storage.ref('signatures/${apartmentNumber}_${apartmentUnit}_technician.png');
       final clientRef = _storage.ref('signatures/${apartmentNumber}_${apartmentUnit}_client.png');
@@ -264,19 +267,23 @@ class InspectionFormController extends GetxController {
       final techUrl = await techRef.getDownloadURL();
       final clientUrl = await clientRef.getDownloadURL();
 
-      await submitReport(
-        apartmentNumber: apartmentNumber,
-        apartmentUnit: apartmentUnit,
-        apartmentName: apartmentName,
-        signatureUrls: {
+      await reportDoc.update({
+        'signatures': {
           'technician': techUrl,
           'client': clientUrl,
         },
-      );
+        'inspectionStatus': 'Done',
+        'updatedAt': Timestamp.now(),
+      });
+
+      Get.snackbar("Success", "Signatures submitted successfully.");
+      Get.back();
     } catch (e) {
       Get.snackbar("Error", "Signature upload failed: $e");
     } finally {
       isLoading.value = false;
     }
   }
+
+
 }

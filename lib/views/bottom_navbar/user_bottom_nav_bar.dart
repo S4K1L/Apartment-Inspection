@@ -1,12 +1,12 @@
 import 'package:apartmentinspection/utils/theme/colors.dart';
-import 'package:apartmentinspection/views/user/battery/battery_history_page.dart';
 import 'package:apartmentinspection/views/user/home.dart';
 import 'package:apartmentinspection/views/profile/profile.dart';
 import 'package:apartmentinspection/views/user/report.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../user/sensor.dart';
+import '../user/battery_history/battery_history_page.dart';
+import '../user/sensor/sensor.dart';
 
 class UserCustomBottomBar extends StatefulWidget {
   const UserCustomBottomBar({super.key});
@@ -19,7 +19,7 @@ class _BottomBarState extends State<UserCustomBottomBar> {
   int indexColor = 0;
   final List<Widget> screens = [
     HomePage(),
-    BatteryPage(),
+    SensorPage(),
     SensorHistoryPage(),
     ReportPage(),
     ProfileScreen(),

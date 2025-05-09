@@ -1,8 +1,6 @@
 import 'dart:ui';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:apartmentinspection/controller/sensor_controller.dart';
-import 'package:apartmentinspection/utils/components/custom_search_bar.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
 import 'package:apartmentinspection/utils/theme/colors.dart';
 import 'package:apartmentinspection/views/user/sensor/sensor_details_page.dart';
@@ -10,10 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class BatteryPage extends StatelessWidget {
+class SensorPage extends StatelessWidget {
   final SensorController controller = Get.put(SensorController());
 
-  BatteryPage({super.key});
+  SensorPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -105,70 +103,73 @@ class BatteryPage extends StatelessWidget {
                         onTap: () => Get.to(() =>
                             SensorDetailPage(unit: unit, index: index),
                             transition: Transition.rightToLeft),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2D2D2D),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                offset: const Offset(0, 6),
-                                blurRadius: 12,
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(16.r),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.apartment, color: kWhiteColor,),
-                                    SizedBox(width: 8.w),
-                                    Expanded(
-                                      child: Text(
-                                        "${unit.apartmentName} - ${unit
-                                            .apartmentNumber} (${unit
-                                            .apartmentUnit})",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16.sp,
-                                            color: kWhiteColor),
-                                      ),
-                                    ),
-                                    Icon(Icons.arrow_forward_ios, size: 16.sp,
-                                        color: kWhiteColor),
-                                  ],
-                                ),
-                                Divider(height: 20.h),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .spaceBetween,
-                                  children: [
-                                    Text("Total: ${unit.totalSensors}",
-                                      style: TextStyle(color: kWhiteColor),),
-                                    Text("Regular: ${unit.regularSensors}",
-                                      style: TextStyle(color: kWhiteColor),),
-                                    Text("Cables: ${unit.threeFeetCables}",
-                                      style: TextStyle(color: kWhiteColor),),
-                                  ],
-                                ),
-                                SizedBox(height: 6.h),
-                                Text(
-                                  "Last Update: ${unit.lastUpdate?.toLocal()
-                                      .toIso8601String()
-                                      .split('T')[0] ?? '-'}",
-                                  style: TextStyle(
-                                    color: isReminderDue ? Colors.red : Colors
-                                        .white,
-                                    fontWeight: isReminderDue
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                  ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2D2D2D),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  offset: const Offset(0, 6),
+                                  blurRadius: 12,
                                 ),
                               ],
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(16.r),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.apartment, color: kWhiteColor,),
+                                      SizedBox(width: 8.w),
+                                      Expanded(
+                                        child: Text(
+                                          "${unit.apartmentName} - ${unit
+                                              .apartmentNumber} (${unit
+                                              .apartmentUnit})",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16.sp,
+                                              color: kWhiteColor),
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_forward_ios, size: 16.sp,
+                                          color: kWhiteColor),
+                                    ],
+                                  ),
+                                  Divider(height: 20.h),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment
+                                        .spaceBetween,
+                                    children: [
+                                      Text("Total: ${unit.totalSensors}",
+                                        style: TextStyle(color: kWhiteColor),),
+                                      Text("Regular: ${unit.regularSensors}",
+                                        style: TextStyle(color: kWhiteColor),),
+                                      Text("Cables: ${unit.threeFeetCables}",
+                                        style: TextStyle(color: kWhiteColor),),
+                                    ],
+                                  ),
+                                  SizedBox(height: 6.h),
+                                  Text(
+                                    "Last Update: ${unit.lastUpdate?.toLocal()
+                                        .toIso8601String()
+                                        .split('T')[0] ?? '-'}",
+                                    style: TextStyle(
+                                      color: isReminderDue ? Colors.red : Colors
+                                          .white,
+                                      fontWeight: isReminderDue
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
