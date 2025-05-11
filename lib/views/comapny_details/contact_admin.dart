@@ -14,11 +14,19 @@ class ContactUsPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        leading: IconButton(onPressed: (){
-          Get.back();
-        }, icon: const Icon(Icons.arrow_back_ios_new,color: kWhiteColor,)),
+        leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: kWhiteColor,
+            )),
         elevation: 0,
-        title: const Text("Contact Us",style: TextStyle(color: kWhiteColor),),
+        title: const Text(
+          "Contact Us",
+          style: TextStyle(color: kWhiteColor),
+        ),
         centerTitle: true,
       ),
       body: Stack(
@@ -71,11 +79,11 @@ class ContactUsPage extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 15,
-            offset: const Offset(5, 5),
+            offset: Offset(5, 5),
           ),
         ],
         border: Border.all(color: Colors.white.withOpacity(0.2)),
@@ -127,13 +135,15 @@ class ContactUsPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Contact Information", style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+          Text("Contact Information",
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
           SizedBox(height: 10.h),
           Row(
             children: [
               const Icon(Icons.email, color: Colors.teal),
               SizedBox(width: 10.w),
-              Text("support@apartmentinspection.com", style: TextStyle(fontSize: 14.sp)),
+              Text("support@apartmentinspection.com",
+                  style: TextStyle(fontSize: 14.sp)),
             ],
           ),
           SizedBox(height: 10.h),
@@ -177,19 +187,22 @@ class ContactUsPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Send Us a Message", style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+          Text("Send Us a Message",
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
           SizedBox(height: 10.h),
           TextField(
             decoration: InputDecoration(
               labelText: "Your Name",
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
           SizedBox(height: 10.h),
           TextField(
             decoration: InputDecoration(
               labelText: "Your Email",
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
           SizedBox(height: 10.h),
@@ -198,22 +211,30 @@ class ContactUsPage extends StatelessWidget {
             decoration: InputDecoration(
               labelText: "Message",
               alignLabelWithHint: true,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
           SizedBox(height: 20.h),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              icon: const Icon(Icons.send,color: kWhiteColor,),
+              icon: const Icon(
+                Icons.send,
+                color: kWhiteColor,
+              ),
               onPressed: () {
                 // TODO: Implement actual send logic
               },
-              label: const Text("Send Message",style: TextStyle(color: kWhiteColor),),
+              label: const Text(
+                "Send Message",
+                style: TextStyle(color: kWhiteColor),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,
                 padding: EdgeInsets.symmetric(vertical: 14.h),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
           )

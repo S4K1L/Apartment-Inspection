@@ -45,10 +45,12 @@ class HomePage extends StatelessWidget {
                 Expanded(
                   child: Obx(() {
                     if (controller.isLoading.value) {
-                      return const Center(child: SpinKitWave(
-                        color: kPrimaryColor,
-                        size: 50.0,
-                      ),);
+                      return const Center(
+                        child: SpinKitWave(
+                          color: kPrimaryColor,
+                          size: 50.0,
+                        ),
+                      );
                     } else if (controller.filteredList.isEmpty) {
                       return const Center(child: Text("No apartments found."));
                     }
@@ -62,9 +64,9 @@ class HomePage extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final apartment = controller.filteredList[index];
                           return ApartmentCard(
-                            number: apartment.apartmentNumber ?? '',
-                            unit: apartment.apartmentUnit ?? '',
-                            apartmentName: apartment.apartmentName ?? '',
+                            number: apartment.apartmentNumber,
+                            unit: apartment.apartmentUnit,
+                            apartmentName: apartment.apartmentName,
                           );
                         },
                       ),
@@ -78,12 +80,11 @@ class HomePage extends StatelessWidget {
       ),
       floatingActionButton: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: kPrimaryColor
-        ),
+            borderRadius: BorderRadius.circular(8), color: kPrimaryColor),
         child: IconButton(
           onPressed: () {
-            Get.to(()=> CreateSensorPage(),transition: Transition.rightToLeft);
+            Get.to(() => CreateSensorPage(),
+                transition: Transition.rightToLeft);
           },
           icon: const Icon(
             Icons.add,

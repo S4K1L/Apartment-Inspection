@@ -30,7 +30,8 @@ class LoginController extends GetxController {
       );
       User? currentUser = _auth.currentUser;
       if (currentUser != null) {
-        DocumentSnapshot doc = await _firestore.collection('users').doc(currentUser.uid).get();
+        DocumentSnapshot doc =
+            await _firestore.collection('users').doc(currentUser.uid).get();
         if (doc.exists) {
           user.value = UserModel.fromSnapshot(doc);
         } else {
@@ -65,7 +66,8 @@ class LoginController extends GetxController {
           errorMessage = 'Too many login attempts. Please try again later.';
           break;
         case 'network-request-failed':
-          errorMessage = 'Network error. Please check your internet connection.';
+          errorMessage =
+              'Network error. Please check your internet connection.';
           break;
         default:
           errorMessage = "Check your email and password";
@@ -104,7 +106,10 @@ class LoginController extends GetxController {
   void routing(BuildContext context) async {
     User? user = FirebaseAuth.instance.currentUser;
 
-    var documentSnapshot = await FirebaseFirestore.instance.collection('users').doc(user?.uid).get();
+    var documentSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user?.uid)
+        .get();
     if (documentSnapshot.exists) {
       String userType = documentSnapshot.get('role');
       if (userType == "user") {
@@ -121,9 +126,8 @@ class LoginController extends GetxController {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(snackBar);
-        Get.offAll(()=> UserCustomBottomBar());
-      }
-      else if (userType == "admin") {
+        Get.offAll(() => const UserCustomBottomBar());
+      } else if (userType == "admin") {
         const snackBar = SnackBar(
           elevation: 10,
           behavior: SnackBarBehavior.floating,
@@ -137,9 +141,8 @@ class LoginController extends GetxController {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(snackBar);
-        Get.offAll(()=> AdminCustomBottomBar());
-      }
-      else {
+        Get.offAll(() => const AdminCustomBottomBar());
+      } else {
         const snackBar = SnackBar(
           elevation: 10,
           behavior: SnackBarBehavior.floating,
@@ -154,8 +157,7 @@ class LoginController extends GetxController {
           ..hideCurrentSnackBar()
           ..showSnackBar(snackBar);
       }
-    }
-    else {
+    } else {
       print('user data not found');
     }
   }
@@ -194,19 +196,25 @@ class LoginController extends GetxController {
 
   bool _validateInputs() {
     if (!GetUtils.isEmail(emailController.text.trim())) {
-      Get.snackbar('Error', 'Enter a valid email address',
+      Get.snackbar(
+        'Error',
+        'Enter a valid email address',
         colorText: kWhiteColor,
         backgroundColor: Colors.red,
         snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.only(bottom: 30, left: 16, right: 16),);
+        margin: const EdgeInsets.only(bottom: 30, left: 16, right: 16),
+      );
       return false;
     }
     if (passwordController.text.trim().length < 6) {
-      Get.snackbar('Error', 'Password must be at least 6 characters',
+      Get.snackbar(
+        'Error',
+        'Password must be at least 6 characters',
         colorText: kWhiteColor,
         backgroundColor: Colors.red,
         snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.only(bottom: 30, left: 16, right: 16),);
+        margin: const EdgeInsets.only(bottom: 30, left: 16, right: 16),
+      );
       return false;
     }
     return true;

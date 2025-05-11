@@ -7,7 +7,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class InspectionFormPage extends StatelessWidget {
-  final InspectionFormController controller = Get.put(InspectionFormController());
+  final InspectionFormController controller =
+      Get.put(InspectionFormController());
   final String apartmentNumber;
   final String apartmentUnit;
   final String roomName;
@@ -38,7 +39,10 @@ class InspectionFormPage extends StatelessWidget {
             SizedBox(width: 8.w),
             Text(
               "PRE$apartmentNumber",
-              style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: kBlackColor),
+              style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                  color: kBlackColor),
             ),
           ],
         ),
@@ -60,7 +64,8 @@ class InspectionFormPage extends StatelessWidget {
             _buildSectionTitle(Icons.comment, "Commentaire / Comment"),
             _buildCommentsField(maxLines: 4),
             SizedBox(height: 20.h),
-            _buildSectionTitle(Icons.report_problem, "Niveau d'intervention / Intervention Level"),
+            _buildSectionTitle(Icons.report_problem,
+                "Niveau d'intervention / Intervention Level"),
             _buildRadioOptions(),
             SizedBox(height: 20.h),
             _buildSectionTitle(Icons.photo_camera, "Photos"),
@@ -73,7 +78,10 @@ class InspectionFormPage extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: FinishedButton(
           onPress: () {
-            controller.addRoomEntry(roomName,apartmentNumber: apartmentNumber, apartmentUnit: apartmentUnit, apartmentName: apartmentName);
+            controller.addRoomEntry(roomName,
+                apartmentNumber: apartmentNumber,
+                apartmentUnit: apartmentUnit,
+                apartmentName: apartmentName);
             Get.back();
           },
           title: "Suivante",
@@ -96,7 +104,10 @@ class InspectionFormPage extends StatelessWidget {
             Expanded(
               child: Text(
                 "Sélection de l’unité: $number - $unite",
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600,color: kWhiteColor),
+                style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                    color: kWhiteColor),
               ),
             ),
           ],
@@ -142,20 +153,20 @@ class InspectionFormPage extends StatelessWidget {
           },
         );
         if (pickedDate != null) {
-          controller.dateController.text = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+          controller.dateController.text =
+              "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
         }
       },
       decoration: InputDecoration(
         hintText: "Date de l’inspection",
         filled: true,
         fillColor: kBackGroundColor,
-        suffixIcon: Icon(Icons.calendar_today),
+        suffixIcon: const Icon(Icons.calendar_today),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         //border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
-
 
   Widget _buildCommentsField({int maxLines = 1}) {
     return TextField(
@@ -172,16 +183,20 @@ class InspectionFormPage extends StatelessWidget {
   }
 
   Widget _buildRadioOptions() {
-    final options = ["🟢 Observation", "🟠 Recommended Action", "🔴 Urgent Intervention"];
+    final options = [
+      "🟢 Observation",
+      "🟠 Recommended Action",
+      "🔴 Urgent Intervention"
+    ];
     return Column(
       children: options
           .map((option) => Obx(() => RadioListTile<String>(
-        title: Text(option),
-        value: option,
-        groupValue: controller.selectedInterventionLevel.value,
-        activeColor: kPrimaryColor,
-        onChanged: (val) => controller.setInterventionLevel(val!),
-      )))
+                title: Text(option),
+                value: option,
+                groupValue: controller.selectedInterventionLevel.value,
+                activeColor: kPrimaryColor,
+                onChanged: (val) => controller.setInterventionLevel(val!),
+              )))
           .toList(),
     );
   }
@@ -191,7 +206,7 @@ class InspectionFormPage extends StatelessWidget {
       if (controller.selectedImages.isEmpty) {
         return GestureDetector(
           onTap: controller.pickImages,
-          child: DottedBorderContainer(),
+          child: const DottedBorderContainer(),
         );
       } else {
         return SizedBox(
@@ -213,7 +228,9 @@ class InspectionFormPage extends StatelessWidget {
                         image: FileImage(image),
                         fit: BoxFit.cover,
                       ),
-                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black26, blurRadius: 4)
+                      ],
                     ),
                   ),
                   Positioned(
@@ -222,12 +239,13 @@ class InspectionFormPage extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () => controller.removeImage(index),
                       child: Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.black87,
                         ),
-                        padding: EdgeInsets.all(4),
-                        child: Icon(Icons.close, color: Colors.white, size: 18.sp),
+                        padding: const EdgeInsets.all(4),
+                        child:
+                            Icon(Icons.close, color: Colors.white, size: 18.sp),
                       ),
                     ),
                   ),
@@ -250,7 +268,8 @@ class DottedBorderContainer extends StatelessWidget {
       height: 160.h,
       width: double.infinity,
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey, style: BorderStyle.solid, width: 1.5),
+        border: Border.all(
+            color: Colors.grey, style: BorderStyle.solid, width: 1.5),
         borderRadius: BorderRadius.circular(12),
         color: Colors.grey[100],
       ),

@@ -54,7 +54,7 @@ class RegisterController extends GetxController {
       User? currentUser = _auth.currentUser;
       if (currentUser != null) {
         DocumentSnapshot doc =
-        await _firestore.collection('users').doc(currentUser.uid).get();
+            await _firestore.collection('users').doc(currentUser.uid).get();
         if (doc.exists) {
           userModel.value = UserModel.fromSnapshot(doc);
         } else {
@@ -76,7 +76,8 @@ class RegisterController extends GetxController {
         margin: const EdgeInsets.only(bottom: 30, left: 16, right: 16),
       );
 
-      Get.offAll(() => UserCustomBottomBar(), transition: Transition.fadeIn);
+      Get.offAll(() => const UserCustomBottomBar(),
+          transition: Transition.fadeIn);
 
       nameController.clear();
       emailController.clear();
@@ -159,7 +160,7 @@ class RegisterController extends GetxController {
       User? currentUser = _auth.currentUser;
       if (currentUser != null) {
         DocumentSnapshot doc =
-        await _firestore.collection('users').doc(currentUser.uid).get();
+            await _firestore.collection('users').doc(currentUser.uid).get();
         if (doc.exists) {
           userModel.value = UserModel.fromSnapshot(doc);
         } else {

@@ -77,11 +77,11 @@ class TermsAndPolicyPage extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 15,
-            offset: const Offset(5, 5),
+            offset: Offset(5, 5),
           ),
         ],
         border: Border.all(color: Colors.white.withOpacity(0.2)),
@@ -97,8 +97,8 @@ class TermsAndPolicyPage extends StatelessWidget {
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
               color: Colors.white,
-              shadows: [
-                const Shadow(
+              shadows: const [
+                Shadow(
                   blurRadius: 10,
                   color: Colors.black26,
                   offset: Offset(2, 2),
@@ -122,11 +122,11 @@ class TermsAndPolicyPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 15,
-            offset: const Offset(0, 5),
+            offset: Offset(0, 5),
           )
         ],
       ),

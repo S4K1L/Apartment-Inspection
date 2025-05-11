@@ -1,6 +1,4 @@
-import 'dart:typed_data';
 import 'package:apartmentinspection/controller/inspection_form_controller.dart';
-import 'package:apartmentinspection/core/my_app.dart';
 import 'package:apartmentinspection/utils/components/finished_button.dart';
 import 'package:apartmentinspection/utils/theme/colors.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +25,8 @@ class SignaturePage extends StatefulWidget {
 }
 
 class _SignaturePageState extends State<SignaturePage> {
-  final InspectionFormController controller = Get.put(InspectionFormController());
+  final InspectionFormController controller =
+      Get.put(InspectionFormController());
 
   final SignatureController technicianSigController = SignatureController(
     penStrokeWidth: 2,
@@ -83,58 +82,71 @@ class _SignaturePageState extends State<SignaturePage> {
           return controller.isLoading.value
               ? const Center(child: CircularProgressIndicator())
               : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text("Technician Signature"),
-              const SizedBox(height: 8),
-              Container(
-                height: 180.sp,
-                decoration: BoxDecoration(
-                  color: Colors.black87,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Signature(
-                  controller: technicianSigController,
-                  backgroundColor: Colors.transparent,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: technicianSigController.clear,
-                    child: const Text("Clear", style: TextStyle(color: kBlackColor)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Text("Client Signature"),
-              const SizedBox(height: 8),
-              Container(
-                height: 180.sp,
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Signature(
-                  controller: clientSigController,
-                  backgroundColor: Colors.transparent,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: clientSigController.clear,
-                    child: const Text("Clear"),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text("Date de validation de la visite",style: TextStyle(fontSize: 18.sp,fontWeight: FontWeight.w500,color: kBlackColor),),
-              Text("Date of validation of the visit",style: TextStyle(fontSize: 16.sp,fontWeight: FontWeight.w300,color: kGreyColor),),
-            ],
-          );
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Technician Signature"),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 180.sp,
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Signature(
+                        controller: technicianSigController,
+                        backgroundColor: Colors.transparent,
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: technicianSigController.clear,
+                          child: const Text("Clear",
+                              style: TextStyle(color: kBlackColor)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text("Client Signature"),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 180.sp,
+                      decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Signature(
+                        controller: clientSigController,
+                        backgroundColor: Colors.transparent,
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: clientSigController.clear,
+                          child: const Text("Clear"),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Date de validation de la visite",
+                      style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w500,
+                          color: kBlackColor),
+                    ),
+                    Text(
+                      "Date of validation of the visit",
+                      style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w300,
+                          color: kGreyColor),
+                    ),
+                  ],
+                );
         }),
       ),
       floatingActionButton: Padding(

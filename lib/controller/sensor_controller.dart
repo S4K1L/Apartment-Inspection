@@ -8,7 +8,6 @@ class SensorController extends GetxController {
   var allSensorUnits = <SensorUnit>[].obs; // Store all units
   final observationController = TextEditingController();
 
-
   @override
   void onInit() {
     super.onInit();
@@ -18,7 +17,8 @@ class SensorController extends GetxController {
   // 0. Fetch sensor data where isDone == false
   Future<void> fetchFromFirebase() async {
     try {
-      final apartmentSnapshot = await FirebaseFirestore.instance.collection('apartments').get();
+      final apartmentSnapshot =
+          await FirebaseFirestore.instance.collection('apartments').get();
 
       List<SensorUnit> allUnits = [];
 
@@ -32,8 +32,6 @@ class SensorController extends GetxController {
 
         if (sensorSnapshot.docs.isNotEmpty) {
           final sensorData = sensorSnapshot.docs.first.data();
-          final docId = sensorSnapshot.docs.first.id;
-
           final unit = SensorUnit.fromMap({
             ...sensorData,
             'apartmentDocId': apartmentDoc.id,
@@ -53,8 +51,7 @@ class SensorController extends GetxController {
   // 1. Toggle sensor checkbox
   void updateCheckbox(int unitIndex, int sensorIndex, bool value) {
     final unit = sensorUnits[unitIndex];
-    final total = unit.totalSensors ?? 14;
-    final currentStatus = unit.sensorStatus ?? List.filled(total, false);
+    final currentStatus = unit.sensorStatus;
     final newStatus = List<bool>.from(currentStatus);
 
     if (sensorIndex >= newStatus.length) {
@@ -112,13 +109,14 @@ class SensorController extends GetxController {
     } else {
       sensorUnits.value = allSensorUnits
           .where((unit) =>
-      unit.apartmentName!.toLowerCase().contains(query.toLowerCase()) ||
-          unit.apartmentNumber!.toLowerCase().contains(query.toLowerCase()) ||
-          unit.apartmentUnit!.toLowerCase().contains(query.toLowerCase()))
+              unit.apartmentName!.toLowerCase().contains(query.toLowerCase()) ||
+              unit.apartmentNumber!
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              unit.apartmentUnit!.toLowerCase().contains(query.toLowerCase()))
           .toList();
     }
   }
-
 
   @override
   void dispose() {
@@ -126,5 +124,4 @@ class SensorController extends GetxController {
     super.dispose();
     observationController.clear();
   }
-
 }

@@ -8,7 +8,8 @@ class FinishedButton extends StatelessWidget {
 
   const FinishedButton({
     super.key,
-     required this.title, required this.onPress,
+    required this.title,
+    required this.onPress,
   });
 
   @override
@@ -24,7 +25,7 @@ class FinishedButton extends StatelessWidget {
           ),
           padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 14.h),
         ),
-        child: Text(title, style: TextStyle(color: Colors.white)),
+        child: Text(title, style: const TextStyle(color: Colors.white)),
       ),
     );
   }

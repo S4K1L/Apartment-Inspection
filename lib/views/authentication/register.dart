@@ -41,7 +41,7 @@ class RegisterScreen extends StatelessWidget {
                       enabled: controller.isLoading.value,
                       enableSwitchAnimation: true,
                       child: BounceInRight(
-                        duration: Duration(milliseconds: 700),
+                        duration: const Duration(milliseconds: 700),
                         child: Column(
                           children: [
                             const SizedBox(height: 30),
@@ -58,9 +58,11 @@ class RegisterScreen extends StatelessWidget {
                                 filled: true,
                                 fillColor: Colors.white,
                                 labelText: 'Mot de passe / Password',
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8)),
                                 suffixIcon: IconButton(
-                                  onPressed: controller.togglePasswordVisibility,
+                                  onPressed:
+                                      controller.togglePasswordVisibility,
                                   icon: Icon(
                                     controller.isPasswordVisible.value
                                         ? Icons.visibility
@@ -82,7 +84,8 @@ class RegisterScreen extends StatelessWidget {
                                         transition: Transition.leftToRight);
                                   },
                                   child: const Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
@@ -91,7 +94,8 @@ class RegisterScreen extends StatelessWidget {
                                       ),
                                       Text(
                                         "Login here ",
-                                        style: TextStyle(color: kSecondaryColor),
+                                        style:
+                                            TextStyle(color: kSecondaryColor),
                                       ),
                                     ],
                                   )),

@@ -22,7 +22,8 @@ class EditProfilePage extends StatelessWidget {
         elevation: 0,
         backgroundColor: kPrimaryColor,
         centerTitle: true,
-        title: const Text("Edit Profile", style: TextStyle(color: Colors.white)),
+        title:
+            const Text("Edit Profile", style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
@@ -49,11 +50,11 @@ class EditProfilePage extends StatelessWidget {
                   radius: 50.r,
                   backgroundColor: kPrimaryColor.withOpacity(0.1),
                   backgroundImage: (controller.user.value.imageUrl != null &&
-                      controller.user.value.imageUrl!.isNotEmpty)
+                          controller.user.value.imageUrl!.isNotEmpty)
                       ? NetworkImage(controller.user.value.imageUrl!)
                       : null,
                   child: controller.user.value.imageUrl == null ||
-                      controller.user.value.imageUrl!.isEmpty
+                          controller.user.value.imageUrl!.isEmpty
                       ? Icon(Icons.person, size: 50.sp, color: kPrimaryColor)
                       : null,
                 ),
@@ -72,14 +73,16 @@ class EditProfilePage extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: "Name",
                     labelStyle: TextStyle(color: Colors.grey.shade700),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.r),
                       borderSide: BorderSide(color: Colors.grey.shade300),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.r),
-                      borderSide: BorderSide(color: kPrimaryColor, width: 2),
+                      borderSide:
+                          const BorderSide(color: kPrimaryColor, width: 2),
                     ),
                     filled: true,
                     fillColor: Colors.grey.shade100,
@@ -90,8 +93,7 @@ class EditProfilePage extends StatelessWidget {
                   width: double.infinity,
                   height: 50.h,
                   child: ElevatedButton(
-                    onPressed: () =>
-                        _updateProfile(nameController.text.trim()),
+                    onPressed: () => _updateProfile(nameController.text.trim()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: kPrimaryColor,
                       shape: RoundedRectangleBorder(

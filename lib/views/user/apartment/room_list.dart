@@ -7,14 +7,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import 'inspection_form.dart';
-import 'room_details.dart';
 
 class RoomListPage extends StatefulWidget {
   final String apartmentNumber;
   final String apartmentUnit;
   final String apartmentName;
 
-  const RoomListPage({super.key, required this.apartmentNumber, required this.apartmentUnit, required this.apartmentName});
+  const RoomListPage(
+      {super.key,
+      required this.apartmentNumber,
+      required this.apartmentUnit,
+      required this.apartmentName});
 
   @override
   State<RoomListPage> createState() => _RoomListPageState();
@@ -65,12 +68,19 @@ class _RoomListPageState extends State<RoomListPage> {
               SizedBox(height: 24.h),
               ...List.generate(
                 rooms.length,
-                    (index) => _buildRoomTile(
+                (index) => _buildRoomTile(
                   onPress: () {
                     setState(() {
                       selectedIndex = index;
                     });
-                    Get.to(()=> InspectionFormPage(apartmentNumber: widget.apartmentNumber, apartmentUnit: widget.apartmentUnit,roomName: rooms[index]["en"].toString(),apartmentName: widget.apartmentName,),transition: Transition.rightToLeft);
+                    Get.to(
+                        () => InspectionFormPage(
+                              apartmentNumber: widget.apartmentNumber,
+                              apartmentUnit: widget.apartmentUnit,
+                              roomName: rooms[index]["en"].toString(),
+                              apartmentName: widget.apartmentName,
+                            ),
+                        transition: Transition.rightToLeft);
                   },
                   fr: rooms[index]["fr"]!,
                   en: rooms[index]["en"]!,
@@ -85,11 +95,13 @@ class _RoomListPageState extends State<RoomListPage> {
         padding: const EdgeInsets.all(8.0),
         child: FinishedButton(
           onPress: () {
-            Get.to(() => SignaturePage(
-              apartmentNumber: widget.apartmentNumber,
-              apartmentUnit: widget.apartmentUnit,
-              apartmentName: widget.apartmentName,
-            ),transition: Transition.rightToLeft);
+            Get.to(
+                () => SignaturePage(
+                      apartmentNumber: widget.apartmentNumber,
+                      apartmentUnit: widget.apartmentUnit,
+                      apartmentName: widget.apartmentName,
+                    ),
+                transition: Transition.rightToLeft);
           },
           title: "Suivante",
         ),

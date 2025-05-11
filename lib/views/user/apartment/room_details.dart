@@ -10,7 +10,12 @@ class RoomDetails extends StatelessWidget {
   final String unit;
   final String roomName;
   final String apartmentName;
-  const RoomDetails({super.key, required this.number, required this.unit, required this.roomName, required this.apartmentName});
+  const RoomDetails(
+      {super.key,
+      required this.number,
+      required this.unit,
+      required this.roomName,
+      required this.apartmentName});
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +46,15 @@ class RoomDetails extends StatelessWidget {
               Container(
                 height: MediaQuery.of(context).size.height / 4,
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(32)
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(32)),
+                child: Image.asset(
+                  Const.apart,
+                  fit: BoxFit.cover,
                 ),
-                child: Image.asset(Const.apart,fit: BoxFit.cover,),
               ),
               SizedBox(height: 20.sp),
               _buildTextField('Commentaire/ ', "Comment", maxLines: 8),
-        
             ],
           ),
         ),
@@ -69,21 +75,21 @@ class RoomDetails extends StatelessWidget {
     return TextField(
       maxLines: maxLines,
       decoration: InputDecoration(
-        label: Row(
-          children: [
-            Text(
-              label,
-              style: TextStyle(color: kBlackColor, fontWeight: FontWeight.w500),
-            ),
-            Text(label2),
-          ],
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-        filled: true,
-        fillColor: kBackGroundColor,
-        border: OutlineInputBorder()
-      ),
+          label: Row(
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                    color: kBlackColor, fontWeight: FontWeight.w500),
+              ),
+              Text(label2),
+            ],
+          ),
+          contentPadding:
+              EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+          filled: true,
+          fillColor: kBackGroundColor,
+          border: const OutlineInputBorder()),
     );
   }
-
 }

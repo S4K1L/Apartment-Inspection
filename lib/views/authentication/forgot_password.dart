@@ -30,7 +30,10 @@ class ForgotPassword extends StatelessWidget {
                 color: kWhiteColor,
               )),
         ),
-        title: Text("Back",style: TextStyle(color: kWhiteColor),),
+        title: const Text(
+          "Back",
+          style: TextStyle(color: kWhiteColor),
+        ),
       ),
       body: Center(
         child: Padding(

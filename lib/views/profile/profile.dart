@@ -1,4 +1,3 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:apartmentinspection/controller/profile_controller.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
 import 'package:apartmentinspection/utils/theme/colors.dart';
@@ -11,7 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class ProfileScreen extends StatefulWidget {
-  ProfileScreen({super.key});
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -83,13 +82,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Stack(
                 children: [
                   Obx(() => CircleAvatar(
-                    radius: 50.sp,
-                    backgroundColor: kWhiteColor,
-                    backgroundImage: (controller.user.value.imageUrl != null &&
-                        controller.user.value.imageUrl!.isNotEmpty)
-                        ? NetworkImage(controller.user.value.imageUrl!)
-                        : const AssetImage(Const.profile) as ImageProvider,
-                  )),
+                        radius: 50.sp,
+                        backgroundColor: kWhiteColor,
+                        backgroundImage: (controller.user.value.imageUrl !=
+                                    null &&
+                                controller.user.value.imageUrl!.isNotEmpty)
+                            ? NetworkImage(controller.user.value.imageUrl!)
+                            : const AssetImage(Const.profile) as ImageProvider,
+                      )),
                   Positioned(
                     bottom: 0,
                     right: 4,
@@ -117,69 +117,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               SizedBox(width: 20.w),
               Obx(() => Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      controller.user.value.name ?? "User Name",
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      controller.user.value.email ?? "user@email.com",
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.white70,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    GestureDetector(
-                      onTap: () => Get.to(() => EditProfilePage(),
-                          transition: Transition.rightToLeft),
-                      child: Container(
-                        height: 40.h,
-                        width: 120.w,
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                            bottomRight: Radius.circular(32),
-                            topLeft: Radius.circular(32),
-                          ),
-                          color: kPrimaryColor,
-                          border: Border.all(color: kWhiteColor, width: 2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
-                              blurRadius: 6.r,
-                              offset: const Offset(2, 4),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Edit Profile",
-                            style: TextStyle(
-                              color: kWhiteColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.sp,
-                            ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          controller.user.value.name ?? "User Name",
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
-                      ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          controller.user.value.email ?? "user@email.com",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+                        GestureDetector(
+                          onTap: () => Get.to(() => EditProfilePage(),
+                              transition: Transition.rightToLeft),
+                          child: Container(
+                            height: 40.h,
+                            width: 120.w,
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.only(
+                                bottomRight: Radius.circular(32),
+                                topLeft: Radius.circular(32),
+                              ),
+                              color: kPrimaryColor,
+                              border: Border.all(color: kWhiteColor, width: 2),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.3),
+                                  blurRadius: 6.r,
+                                  offset: const Offset(2, 4),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Edit Profile",
+                                style: TextStyle(
+                                  color: kWhiteColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14.sp,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              )),
+                  )),
             ],
           ),
         ),
       ],
     );
   }
-
 
   Widget _buildStats(int reportCount, int users) {
     return Padding(
@@ -226,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           height: 50.h,
           width: double.infinity,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(32),
               bottomRight: Radius.circular(32),
             ),
@@ -235,7 +234,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               BoxShadow(
                 color: Colors.indigo.withOpacity(0.4),
                 blurRadius: 8.r,
-                offset: Offset(0, 5),
+                offset: const Offset(0, 5),
               ),
             ],
           ),
@@ -254,13 +253,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       children: [
         _profileTile(() {
-          Get.to(() => AboutUsPage(), transition: Transition.rightToLeft);
+          Get.to(() => const AboutUsPage(), transition: Transition.rightToLeft);
         }, Icons.info_outline, "About Us"),
         _profileTile(() {
-          Get.to(() => ContactUsPage(), transition: Transition.rightToLeft);
+          Get.to(() => const ContactUsPage(),
+              transition: Transition.rightToLeft);
         }, Icons.support_agent, "Contact Us"),
         _profileTile(() {
-          Get.to(() => TermsAndPolicyPage(), transition: Transition.rightToLeft);
+          Get.to(() => const TermsAndPolicyPage(),
+              transition: Transition.rightToLeft);
         }, Icons.policy_outlined, "Terms & Policy"),
       ],
     );
@@ -270,11 +271,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       children: [
         _profileTile(
-              () => showDeleteConfirmationDialog(
+          () => showDeleteConfirmationDialog(
             context,
             "Delete Account",
             "Are you sure you want to delete your account? This action is irreversible.",
-                () {
+            () {
               Get.back();
               controller.deleteUserAccount();
             },

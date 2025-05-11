@@ -50,8 +50,10 @@ class ReportController extends GetxController {
     Uint8List? techSignature;
     Uint8List? clientSignature;
     if (report['signatures'] != null) {
-      techSignature = await networkImageToBytes(report['signatures']['technician']);
-      clientSignature = await networkImageToBytes(report['signatures']['client']);
+      techSignature =
+          await networkImageToBytes(report['signatures']['technician']);
+      clientSignature =
+          await networkImageToBytes(report['signatures']['client']);
     }
 
     // Preload all room entry images
@@ -81,7 +83,7 @@ class ReportController extends GetxController {
                 ),
                 if (imageBytes != null) ...[
                   pw.Spacer(),
-                  pw.Image(pw.MemoryImage(imageBytes), height: 150,width: 150),
+                  pw.Image(pw.MemoryImage(imageBytes), height: 150, width: 150),
                   pw.SizedBox(width: 10),
                 ],
               ],
@@ -101,7 +103,8 @@ class ReportController extends GetxController {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text(room['roomName'], style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text(room['roomName'],
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
               ...entryWidgets,
             ],
           ),
@@ -130,7 +133,8 @@ class ReportController extends GetxController {
                       color: PdfColors.white,
                     ),
                   ),
-                  pw.Image(pw.MemoryImage(logo.buffer.asUint8List()), width: 50),
+                  pw.Image(pw.MemoryImage(logo.buffer.asUint8List()),
+                      width: 50),
                 ],
               ),
             ),
@@ -138,10 +142,12 @@ class ReportController extends GetxController {
             pw.Center(
               child: pw.Column(
                 children: [
-                  pw.Text('${report['apartmentName']} : ${report['apartmentNumber']} - ${report['apartmentUnit']}',
-                      style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                  pw.Text(
+                      '${report['apartmentName']} : ${report['apartmentNumber']} - ${report['apartmentUnit']}',
+                      style: pw.TextStyle(
+                          fontSize: 16, fontWeight: pw.FontWeight.bold)),
                   pw.Text('Covers summary, rooms, schedule and comments',
-                      style: pw.TextStyle(fontSize: 10)),
+                      style: const pw.TextStyle(fontSize: 10)),
                 ],
               ),
             ),
@@ -171,44 +177,46 @@ class ReportController extends GetxController {
               ],
             ),
             pw.SizedBox(height: 20),
-            pw.Text('Room Inspections', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+            pw.Text('Room Inspections',
+                style:
+                    pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
             ...roomWidgets,
             if (techSignature != null || clientSignature != null)
               pw.Row(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
                   pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.SizedBox(height: 20),
-                      pw.Text("Signatures", style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
-                      pw.SizedBox(height: 10),
-                      if (techSignature != null)
-                        pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.Text("Technician :"),
-                            pw.SizedBox(height: 10),
-                            pw.Image(pw.MemoryImage(techSignature), height: 50),
-                          ],
-                        ),
-                    ]
-                  ),
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.SizedBox(height: 20),
+                        pw.Text("Signatures",
+                            style: pw.TextStyle(
+                                fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                        pw.SizedBox(height: 10),
+                        if (techSignature != null)
+                          pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              pw.Text("Technician :"),
+                              pw.SizedBox(height: 10),
+                              pw.Image(pw.MemoryImage(techSignature),
+                                  height: 50),
+                            ],
+                          ),
+                      ]),
                   pw.Spacer(),
-                  pw.Column(
-                    children: [
-                      if (clientSignature != null)
-                        pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.SizedBox(height: 40),
-                            pw.Text("Client :"),
-                            pw.SizedBox(height: 10),
-                            pw.Image(pw.MemoryImage(clientSignature), height: 50),
-                          ],
-                        ),
-                    ]
-                  ),
+                  pw.Column(children: [
+                    if (clientSignature != null)
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.SizedBox(height: 40),
+                          pw.Text("Client :"),
+                          pw.SizedBox(height: 10),
+                          pw.Image(pw.MemoryImage(clientSignature), height: 50),
+                        ],
+                      ),
+                  ]),
                 ],
               ),
             pw.SizedBox(height: 20),
@@ -216,7 +224,8 @@ class ReportController extends GetxController {
             pw.Center(
               child: pw.Text(
                 'Generated by Apartment Inspection App',
-                style: pw.TextStyle(fontSize: 8, fontStyle: pw.FontStyle.italic),
+                style:
+                    pw.TextStyle(fontSize: 8, fontStyle: pw.FontStyle.italic),
               ),
             ),
           ];
@@ -227,7 +236,6 @@ class ReportController extends GetxController {
     return pdf.save();
   }
 
-
 // Helper for info blocks
   pw.Widget _infoCard(String title, String value) {
     return pw.Container(
@@ -235,7 +243,11 @@ class ReportController extends GetxController {
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text(title, style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey800)),
+          pw.Text(title,
+              style: pw.TextStyle(
+                  fontSize: 10,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.blueGrey800)),
           pw.Text(value, style: const pw.TextStyle(fontSize: 10)),
         ],
       ),
@@ -253,7 +265,9 @@ class ReportController extends GetxController {
         final unit = report['apartmentUnit'].toString().toLowerCase();
         final search = query.toLowerCase();
 
-        return apartmentName.contains(search) || apartment.contains(search) || unit.contains(search);
+        return apartmentName.contains(search) ||
+            apartment.contains(search) ||
+            unit.contains(search);
       }).toList();
     }
   }
@@ -294,7 +308,6 @@ class ReportController extends GetxController {
     );
   }
 
-
   Future<Uint8List> networkImageToBytes(String url) async {
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
@@ -309,7 +322,8 @@ class ReportController extends GetxController {
       if (Platform.isAndroid) {
         final status = await Permission.manageExternalStorage.request();
         if (!status.isGranted) {
-          Get.snackbar("Permission Denied", "Storage permission is required to save the file.",
+          Get.snackbar("Permission Denied",
+              "Storage permission is required to save the file.",
               backgroundColor: Colors.red, colorText: Colors.white);
           return;
         }

@@ -11,7 +11,6 @@ class InspectionFormController extends GetxController {
   final commentController = TextEditingController();
   final dateController = TextEditingController();
   final interventionLevelController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   var selectedInterventionLevel = 'Observation'.obs;
   final selectedImages = <File>[].obs;
 
@@ -28,7 +27,7 @@ class InspectionFormController extends GetxController {
 
   Future<void> pickImages() async {
     final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+    if (pickedFiles.isNotEmpty) {
       selectedImages.addAll(pickedFiles.map((e) => File(e.path)));
     }
   }
@@ -41,17 +40,18 @@ class InspectionFormController extends GetxController {
 
   Future<String?> uploadImage(File? imageFile) async {
     if (imageFile == null) return null;
-    final ref = _storage.ref('reports/${DateTime.now().millisecondsSinceEpoch}.png');
+    final ref =
+        _storage.ref('reports/${DateTime.now().millisecondsSinceEpoch}.png');
     final uploadTask = await ref.putFile(imageFile);
     return await uploadTask.ref.getDownloadURL();
   }
 
   Future<void> addRoomEntry(
-      String roomName, {
-        required String? apartmentNumber,
-        required String? apartmentUnit,
-        required String? apartmentName,
-      }) async {
+    String roomName, {
+    required String? apartmentNumber,
+    required String? apartmentUnit,
+    required String? apartmentName,
+  }) async {
     if (commentController.text.isEmpty) {
       Get.snackbar("Error", "Comment is required for the room");
       return;
@@ -60,7 +60,8 @@ class InspectionFormController extends GetxController {
     try {
       isLoading.value = true;
 
-      final imageToUpload = selectedImages.isNotEmpty ? selectedImages.first : null;
+      final imageToUpload =
+          selectedImages.isNotEmpty ? selectedImages.first : null;
       final imageUrl = await uploadImage(imageToUpload);
 
       final entry = {
@@ -99,10 +100,11 @@ class InspectionFormController extends GetxController {
         final docRef = _firestore.collection('reports').doc(doc.id);
         final rooms = List<Map<String, dynamic>>.from(doc['rooms'] ?? []);
 
-        final roomIndex = rooms.indexWhere((room) => room['roomName'] == roomName);
+        final roomIndex =
+            rooms.indexWhere((room) => room['roomName'] == roomName);
         if (roomIndex != -1) {
-          List<Map<String, dynamic>> entries =
-          List<Map<String, dynamic>>.from(rooms[roomIndex]['entries'] ?? []);
+          List<Map<String, dynamic>> entries = List<Map<String, dynamic>>.from(
+              rooms[roomIndex]['entries'] ?? []);
           entries.add(entry);
           rooms[roomIndex]['entries'] = entries;
         } else {
@@ -166,10 +168,12 @@ class InspectionFormController extends GetxController {
 
       if (query.docs.isNotEmpty) {
         final doc = query.docs.first;
-        final existingRooms = List<Map<String, dynamic>>.from(doc['rooms'] ?? []);
+        final existingRooms =
+            List<Map<String, dynamic>>.from(doc['rooms'] ?? []);
 
         for (var newRoom in newRoomList) {
-          final index = existingRooms.indexWhere((room) => room['roomName'] == newRoom['roomName']);
+          final index = existingRooms
+              .indexWhere((room) => room['roomName'] == newRoom['roomName']);
           if (index != -1) {
             existingRooms[index] = newRoom;
           } else {
@@ -239,8 +243,10 @@ class InspectionFormController extends GetxController {
           .collection('reports')
           .where('apartmentNumber', isEqualTo: apartmentNumber)
           .where('apartmentUnit', isEqualTo: apartmentUnit)
-          .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
-          .where('createdAt', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
+          .where('createdAt',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+          .where('createdAt',
+              isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
           .limit(1)
           .get();
 
@@ -258,8 +264,10 @@ class InspectionFormController extends GetxController {
         throw "Signature conversion failed";
       }
 
-      final techRef = _storage.ref('signatures/${apartmentNumber}_${apartmentUnit}_technician.png');
-      final clientRef = _storage.ref('signatures/${apartmentNumber}_${apartmentUnit}_client.png');
+      final techRef = _storage
+          .ref('signatures/${apartmentNumber}_${apartmentUnit}_technician.png');
+      final clientRef = _storage
+          .ref('signatures/${apartmentNumber}_${apartmentUnit}_client.png');
 
       await techRef.putData(techData);
       await clientRef.putData(clientData);
@@ -284,6 +292,4 @@ class InspectionFormController extends GetxController {
       isLoading.value = false;
     }
   }
-
-
 }

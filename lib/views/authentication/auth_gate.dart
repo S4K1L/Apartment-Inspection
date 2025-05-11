@@ -33,20 +33,20 @@ class _AuthGateState extends State<AuthGate> {
 
   void _route() async {
     User? user = FirebaseAuth.instance.currentUser;
-    var documentSnapshot = await FirebaseFirestore.instance.collection('users').doc(user?.uid).get();
+    var documentSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user?.uid)
+        .get();
     if (documentSnapshot.exists) {
       String userType = documentSnapshot.get('role');
       if (userType == "user") {
-        Get.offAll(()=> UserCustomBottomBar());
-      }
-      else if (userType == "admin") {
-        Get.offAll(()=> AdminCustomBottomBar());
-      }
-      else {
+        Get.offAll(() => const UserCustomBottomBar());
+      } else if (userType == "admin") {
+        Get.offAll(() => const AdminCustomBottomBar());
+      } else {
         print('user data not found');
       }
-    }
-    else {
+    } else {
       print('user data not found');
     }
   }

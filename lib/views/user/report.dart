@@ -35,7 +35,7 @@ class ReportPage extends StatelessWidget {
                   bottomLeft: Radius.circular(28.r),
                   bottomRight: Radius.circular(28.r),
                 ),
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [Color(0xFF0C2A69), Color(0xFF132D46)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -47,7 +47,10 @@ class ReportPage extends StatelessWidget {
                 children: [
                   Text(
                     "Reports",
-                    style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold, color: kWhiteColor),
+                    style: TextStyle(
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.bold,
+                        color: kWhiteColor),
                   ),
                   SizedBox(height: 12.h),
                   // Search bar
@@ -63,7 +66,8 @@ class ReportPage extends StatelessWidget {
                         border: InputBorder.none,
                         icon: Icon(Icons.search, color: Colors.grey),
                       ),
-                      onChanged: controller.searchReports, // Add this method in controller if needed
+                      onChanged: controller
+                          .searchReports, // Add this method in controller if needed
                     ),
                   ),
                 ],
@@ -74,10 +78,12 @@ class ReportPage extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
-                  return const Center(child: SpinKitWave(
-                    color: kPrimaryColor,
-                    size: 50.0,
-                  ),);
+                  return const Center(
+                    child: SpinKitWave(
+                      color: kPrimaryColor,
+                      size: 50.0,
+                    ),
+                  );
                 }
 
                 if (controller.reports.isEmpty) {
@@ -89,15 +95,19 @@ class ReportPage extends StatelessWidget {
                   color: kPrimaryColor,
                   backgroundColor: Colors.white,
                   child: ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                     itemCount: controller.reports.length,
                     itemBuilder: (context, index) {
                       final report = controller.reports[index];
                       return Container(
-                        margin: EdgeInsets.only(bottom: 16.h),
+                          margin: EdgeInsets.only(bottom: 16.h),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [Colors.indigo.shade700, Colors.indigo.shade800],
+                              colors: [
+                                Colors.indigo.shade700,
+                                Colors.indigo.shade800
+                              ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
@@ -110,97 +120,103 @@ class ReportPage extends StatelessWidget {
                               )
                             ],
                           ),
-                        child: Slidable(
-                          key: ValueKey(report['id']),
-                          startActionPane: ActionPane(
-                            motion: const ScrollMotion(),
-                            children: [
-                              SlidableAction(
-                                onPressed: (_) {
-                                  Get.defaultDialog(
-                                    title: "Confirm Deletion",
-                                    middleText: "Are you sure you want to delete this report?",
-                                    textCancel: "No",
-                                    textConfirm: "Yes",
-                                    confirmTextColor: Colors.white,
-                                    onConfirm: () async {
-                                      Get.back(); // Close the dialog first
-                                      await controller.deleteReport(report['id']);
-                                    },
-                                  );
-                                },
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
-                                icon: Icons.delete,
-                                label: 'Delete',
-                              ),
-                            ],
-                          ),
-                          endActionPane: ActionPane(
-                            motion: const ScrollMotion(),
-                            children: [
-                              SlidableAction(
-                                onPressed: (_) async {
-                                  final pdfBytes = await controller.generatePdf(report);
-                                  await Printing.layoutPdf(onLayout: (_) async => pdfBytes);
-                                },
-                                backgroundColor: Colors.green,
-                                foregroundColor: Colors.white,
-                                icon: Icons.picture_as_pdf,
-                                label: 'Download PDF',
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                height: 100.h,
-                                width: 100.w,
-                                padding: const EdgeInsets.all(12),
-                                decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    bottomLeft: Radius.circular(20),
-                                  ),
-                                  color: Colors.white,
+                          child: Slidable(
+                            key: ValueKey(report['id']),
+                            startActionPane: ActionPane(
+                              motion: const ScrollMotion(),
+                              children: [
+                                SlidableAction(
+                                  onPressed: (_) {
+                                    Get.defaultDialog(
+                                      title: "Confirm Deletion",
+                                      middleText:
+                                          "Are you sure you want to delete this report?",
+                                      textCancel: "No",
+                                      textConfirm: "Yes",
+                                      confirmTextColor: Colors.white,
+                                      onConfirm: () async {
+                                        Get.back(); // Close the dialog first
+                                        await controller
+                                            .deleteReport(report['id']);
+                                      },
+                                    );
+                                  },
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  icon: Icons.delete,
+                                  label: 'Delete',
                                 ),
-                                child: Image.asset(Const.report, fit: BoxFit.cover),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "${report['apartmentName']} ${report['apartmentNumber']} (${report['apartmentUnit']})",
-                                        style: TextStyle(
-                                          fontSize: 18.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                              ],
+                            ),
+                            endActionPane: ActionPane(
+                              motion: const ScrollMotion(),
+                              children: [
+                                SlidableAction(
+                                  onPressed: (_) async {
+                                    final pdfBytes =
+                                        await controller.generatePdf(report);
+                                    await Printing.layoutPdf(
+                                        onLayout: (_) async => pdfBytes);
+                                  },
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                  icon: Icons.picture_as_pdf,
+                                  label: 'Download PDF',
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 100.h,
+                                  width: 100.w,
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      bottomLeft: Radius.circular(20),
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                  child: Image.asset(Const.report,
+                                      fit: BoxFit.cover),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${report['apartmentName']} ${report['apartmentNumber']} (${report['apartmentUnit']})",
+                                          style: TextStyle(
+                                            fontSize: 18.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        "Swap left or right",
-                                        style: TextStyle(
-                                          fontSize: 14.sp,
-                                          color: Colors.white70,
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          "Swap left or right",
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.white70,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(right: 16),
-                                child: Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
-                              ),
-                            ],
-                          ),
-                        )
-
-                      );
+                                const Padding(
+                                  padding: EdgeInsets.only(right: 16),
+                                  child: Icon(Icons.arrow_forward_ios,
+                                      color: Colors.white, size: 18),
+                                ),
+                              ],
+                            ),
+                          ));
                     },
                   ),
                 );

@@ -7,7 +7,8 @@ import 'package:mailer/smtp_server.dart';
 Future<void> checkAndSendEmailForOutdatedSensors() async {
   final now = DateTime.now();
   final threshold = now.subtract(const Duration(days: 30));
-  final apartments = await FirebaseFirestore.instance.collection('apartments').get();
+  final apartments =
+      await FirebaseFirestore.instance.collection('apartments').get();
 
   for (var apartmentDoc in apartments.docs) {
     final sensorsRef = apartmentDoc.reference.collection('sensor');
@@ -19,12 +20,14 @@ Future<void> checkAndSendEmailForOutdatedSensors() async {
       print("Found outdated sensors in apartment: ${apartmentDoc.id}");
 
       // Send email
-      await sendEmailNotification(apartmentDoc.id, outdatedSensorsQuery.docs.length);
+      await sendEmailNotification(
+          apartmentDoc.id, outdatedSensorsQuery.docs.length);
     }
   }
 }
 
-Future<void> sendEmailNotification(String apartmentId, int outdatedCount) async {
+Future<void> sendEmailNotification(
+    String apartmentId, int outdatedCount) async {
   String username = Const.smtpUsername;
   String password = Const.smtpPassword;
 
@@ -43,7 +46,8 @@ Future<void> sendEmailNotification(String apartmentId, int outdatedCount) async 
     ..from = Address(username, 'Apartment Sensor Alert')
     ..recipients.add(userEmail)
     ..subject = 'Alert: Outdated Sensor(s) in Apartment $apartmentId'
-    ..text = 'There are $outdatedCount sensor(s) batteries in apartment $apartmentId that haven\'t been changed in 30+ days. Please check the system.'
+    ..text =
+        'There are $outdatedCount sensor(s) batteries in apartment $apartmentId that haven\'t been changed in 30+ days. Please check the system.'
     ..html = '''
       <h2>Apartment Sensor Alert</h2>
       <p><strong>$outdatedCount</strong> sensor(s) in apartment <strong>$apartmentId</strong> have not been updated in over 30 days.</p>
@@ -52,7 +56,7 @@ Future<void> sendEmailNotification(String apartmentId, int outdatedCount) async 
 
   try {
     final sendReport = await send(message, smtpServer);
-    print('Email sent: ' + sendReport.toString());
+    print('Email sent: $sendReport');
   } on MailerException catch (e) {
     print('Email not sent.');
     for (var p in e.problems) {
