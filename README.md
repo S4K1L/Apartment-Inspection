@@ -20,7 +20,7 @@ This application simplifies the inspection process, making property management e
 
 ## 📱 Screenshots
 
-| Home Screen | Inspection Detail | New Inspection |
+| Login Screen | Home Screen | Profile Screen |
 |:-----------:|:------------------:|:--------------:|
 | ![Login](assets/screenshots/login.png) | ![Home](assets/screenshots/home.png) | ![Profile](assets/screenshots/profile.png) |
 
