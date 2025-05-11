@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Apartment Inspection',
-          home: AuthGate(),
+          home: const AuthGate(),
           supportedLocales: const [
             Locale('en'), // English
             Locale('fr'), // French
