@@ -22,7 +22,7 @@ This application simplifies the inspection process, making property management e
 
 | Home Screen | Inspection Detail | New Inspection |
 |:-----------:|:------------------:|:--------------:|
-| ![Home](assets/screenshots/home.png) | ![Detail](assets/screenshots/detail.png) | ![New](assets/screenshots/new.png) |
+| ![Login](assets/screenshots/login.png) | ![Home](assets/screenshots/home.png) | ![Profile](assets/screenshots/profile.png) |
 
 *(Optional: replace with actual screenshots of your app.)*
 
@@ -47,8 +47,7 @@ lib/
 ├── models/           # Data models (Inspection, User)
 ├── services/         # Firebase & Local Storage services
 ├── views/            # UI screens and widgets
-├── bindings/         # GetX dependency injections
-├── routes/           # App navigation routes
+├── utils/            # Widgets, components, theme, constant
 └── main.dart         # App entry point
 ```
 
