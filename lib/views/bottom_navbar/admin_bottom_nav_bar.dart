@@ -17,31 +17,26 @@ class _BottomBarState extends State<AdminCustomBottomBar> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
-      child: Scaffold(
-        body: screens[indexColor],
-        bottomNavigationBar: BottomAppBar(
-          elevation: 10,
-          color: kWhiteColor,
-          shape: const CircularNotchedRectangle(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildBottomNavigationItem(Icons.map, 1,"Statistics"),
-                  _buildBottomNavigationItem(CupertinoIcons.lock_shield, 2, "Search"),
-                  _buildBottomNavigationItem(Icons.home, 0,"Dashboard"),
-                  _buildBottomNavigationItem(Icons.dynamic_feed, 3, "Analysis "),
-                  _buildBottomNavigationItem(Icons.person, 4, "Account"),
-                ],
-              ),
-            ],
-          ),
+    return Scaffold(
+      body: screens[indexColor],
+      bottomNavigationBar: BottomAppBar(
+        elevation: 10,
+        color: kWhiteColor,
+        shape: const CircularNotchedRectangle(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildBottomNavigationItem(Icons.map, 1,"Statistics"),
+                _buildBottomNavigationItem(CupertinoIcons.lock_shield, 2, "Search"),
+                _buildBottomNavigationItem(Icons.home, 0,"Dashboard"),
+                _buildBottomNavigationItem(Icons.dynamic_feed, 3, "Analysis "),
+                _buildBottomNavigationItem(Icons.person, 4, "Account"),
+              ],
+            ),
+          ],
         ),
       ),
     );

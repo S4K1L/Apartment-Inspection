@@ -36,13 +36,13 @@ class LoginController extends GetxController {
           user.value = UserModel.fromSnapshot(doc);
         } else {
           user.value = UserModel();
-          print("No user data found in Firestore");
+          if (kDebugMode) {
+            print("No user data found in Firestore");
+          }
         }
       }
       isLoading.value = false;
       routing(context);
-      emailController.clear();
-      passwordController.clear();
     } on FirebaseAuthException catch (e) {
       isLoading.value = false;
 
@@ -219,4 +219,13 @@ class LoginController extends GetxController {
     }
     return true;
   }
+
+  @override
+  void onClose() {
+    emailController.dispose();
+    passwordController.dispose();
+    forgotEmailController.dispose();
+    super.onClose();
+  }
+
 }

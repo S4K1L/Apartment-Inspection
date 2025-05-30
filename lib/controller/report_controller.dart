@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:http/http.dart' as http;
-import 'dart:typed_data';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -15,7 +14,6 @@ import 'package:flutter/material.dart';
 class ReportController extends GetxController {
   final reports = [].obs;
   final isLoading = false.obs;
-
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 

@@ -4,9 +4,8 @@ import '../../models/apartment_model.dart';
 
 class ApartmentController extends GetxController {
   var isLoading = true.obs;
-  var apartmentList = <ApartmentModel>[].obs;  // ✅ typed list
-  var filteredList = <ApartmentModel>[].obs;   // ✅ typed list
-
+  var apartmentList = <ApartmentModel>[].obs;
+  var filteredList = <ApartmentModel>[].obs;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override

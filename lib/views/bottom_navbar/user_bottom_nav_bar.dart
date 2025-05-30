@@ -27,22 +27,19 @@ class _BottomBarState extends State<UserCustomBottomBar> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        backgroundColor: kBackGroundColor,
-        body: screens[indexColor],
-        bottomNavigationBar: SizedBox(
-          height: 60.sp,
-          child: Row(
-            children: [
-              _buildBottomNavigationItem(CupertinoIcons.battery_full, 1, "Battery"),
-              _buildBottomNavigationItem(Icons.history_toggle_off, 2, "History"),
-              _buildBottomNavigationItem(Icons.home, 0, "Home"),
-              _buildBottomNavigationItem(Icons.dynamic_feed, 3, "Report"),
-              _buildBottomNavigationItem(Icons.person, 4, "Account"),
-            ],
-          ),
+    return Scaffold(
+      backgroundColor: kBackGroundColor,
+      body: screens[indexColor],
+      bottomNavigationBar: SizedBox(
+        height: 60.sp,
+        child: Row(
+          children: [
+            _buildBottomNavigationItem(CupertinoIcons.battery_full, 1, "Battery"),
+            _buildBottomNavigationItem(Icons.history_toggle_off, 2, "History"),
+            _buildBottomNavigationItem(Icons.home, 0, "Home"),
+            _buildBottomNavigationItem(Icons.dynamic_feed, 3, "Report"),
+            _buildBottomNavigationItem(Icons.person, 4, "Account"),
+          ],
         ),
       ),
     );

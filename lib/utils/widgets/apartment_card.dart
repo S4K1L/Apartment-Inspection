@@ -81,14 +81,6 @@ class ApartmentCard extends StatelessWidget {
                                     fontSize: 24.sp,
                                   ),
                                 ),
-                                Text(
-                                  unit,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 24.sp,
-                                  ),
-                                ),
                               ],
                             ),
                           ),

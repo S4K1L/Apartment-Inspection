@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../services/smtp_server.dart';
 import 'login.dart';
 
 class AuthGate extends StatefulWidget {
@@ -49,5 +50,7 @@ class _AuthGateState extends State<AuthGate> {
     } else {
       print('user data not found');
     }
+    //smtp server
+    await checkAndSendEmailForOutdatedSensors();
   }
 }
