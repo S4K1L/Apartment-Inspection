@@ -7,8 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class InspectionFormPage extends StatelessWidget {
-  final InspectionFormController controller =
-      Get.put(InspectionFormController());
+  final InspectionFormController controller = Get.put(InspectionFormController());
   final String apartmentNumber;
   final String apartmentUnit;
   final String roomName;
@@ -33,19 +32,14 @@ class InspectionFormPage extends StatelessWidget {
           onPressed: () => Get.back(),
           icon: const Icon(Icons.arrow_back_ios, color: kBlackColor),
         ),
-        title: Row(
-          children: [
-            Image.asset(Const.logo, height: 32.h),
-            SizedBox(width: 8.w),
-            Text(
-              "PRE$apartmentNumber",
-              style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                  color: kBlackColor),
-            ),
-          ],
+        title: Text(
+          "Inspection Form",
+          style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+              color: kBlackColor),
         ),
+        centerTitle: true,
         actions: [
           Image.asset(Const.bar, height: 26.sp),
           SizedBox(width: 10.w),
@@ -57,9 +51,6 @@ class InspectionFormPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(apartmentNumber, apartmentUnit),
-            SizedBox(height: 20.h),
-            //_buildSectionTitle(Icons.calendar_today, "Date de l’inspection / Date of Inspection"),
-            _buildTextField(),
             SizedBox(height: 20.h),
             _buildSectionTitle(Icons.comment, "Commentaire / Comment"),
             _buildCommentsField(maxLines: 4),
@@ -99,13 +90,13 @@ class InspectionFormPage extends StatelessWidget {
         padding: EdgeInsets.all(16.w),
         child: Row(
           children: [
-            Icon(Icons.apartment, color: kPrimaryColor, size: 24.sp),
+            Icon(Icons.roofing, color: kWhiteColor, size: 24.sp),
             SizedBox(width: 10.w),
             Expanded(
               child: Text(
-                "Sélection de l’unité: $number - $unite",
+                roomName,
                 style: TextStyle(
-                    fontSize: 18.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
                     color: kWhiteColor),
               ),
@@ -129,45 +120,6 @@ class InspectionFormPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField() {
-    return TextField(
-      controller: controller.dateController,
-      readOnly: true,
-      onTap: () async {
-        DateTime? pickedDate = await showDatePicker(
-          context: Get.context!,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2101),
-          builder: (context, child) {
-            return Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: const ColorScheme.light(
-                  primary: kPrimaryColor, // customize as needed
-                  onPrimary: Colors.white,
-                  onSurface: Colors.black,
-                ),
-              ),
-              child: child!,
-            );
-          },
-        );
-        if (pickedDate != null) {
-          controller.dateController.text =
-              "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
-        }
-      },
-      decoration: InputDecoration(
-        hintText: "Date de l’inspection",
-        filled: true,
-        fillColor: kBackGroundColor,
-        suffixIcon: const Icon(Icons.calendar_today),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-        //border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-  }
-
   Widget _buildCommentsField({int maxLines = 1}) {
     return TextField(
       controller: controller.commentController,
@@ -184,9 +136,9 @@ class InspectionFormPage extends StatelessWidget {
 
   Widget _buildRadioOptions() {
     final options = [
-      "🟢 Observation",
-      "🟠 Recommended Action",
-      "🔴 Urgent Intervention"
+      "Observation",
+      "Recommended Action",
+      "Urgent Intervention"
     ];
     return Column(
       children: options

@@ -66,7 +66,7 @@ class ApartmentCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Apartment Location",
+                                  "Unit Number",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -74,12 +74,13 @@ class ApartmentCard extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  number,
+                                  "$number-$unit",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 24.sp,
+                                    fontSize: 22.sp,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),

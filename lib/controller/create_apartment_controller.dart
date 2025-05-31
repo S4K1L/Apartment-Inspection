@@ -11,8 +11,10 @@ class CreateApartmentController extends GetxController {
   final isLoading = false.obs;
   RxString selectedApartmentName = ''.obs;
 
+
   Future<void> uploadSensorData() async {
     isLoading.value = true;
+
     try {
       final String name = selectedApartmentName.value.trim();
       final String number = apartmentNumber.text.trim();
@@ -23,10 +25,17 @@ class CreateApartmentController extends GetxController {
 
       final List<bool> sensorStatus = List.generate(total, (_) => false);
 
-      final data = {
+      /// Unit metadata to be saved in /apartments_data/{unitId}
+      final unitData = {
         "apartmentName": name,
+        "apartmentNameLower": name.toLowerCase(),
         "apartmentNumber": number,
         "apartmentUnit": unit,
+        "createdAt": FieldValue.serverTimestamp(), // Optional metadata
+      };
+
+      /// Sensor-specific data for /sensors/ subcollection
+      final sensorData = {
         "regularSensors": regular,
         "threeFeetCables": cables,
         "totalSensors": total,
@@ -34,26 +43,32 @@ class CreateApartmentController extends GetxController {
         "isDone": false,
         "lastUpdate": null,
         "observations": "",
-      };
-
-      final apartmentRef = FirebaseFirestore.instance.collection('apartments').doc(unit);
-
-      await apartmentRef.set({
         "apartmentName": name,
         "apartmentNumber": number,
         "apartmentUnit": unit,
-      });
+      };
 
-      await apartmentRef.collection('sensor').add(data);
+      /// Add unit document to /apartments/
+      final unitDocRef = await FirebaseFirestore.instance
+          .collection('apartments')
+          .add(unitData);
 
-      Get.snackbar("Success", "Sensor data uploaded successfully", snackPosition: SnackPosition.BOTTOM);
+      /// Add sensor document under /apartments_data/{unitId}/sensors/
+      await unitDocRef.collection('sensors').add(sensorData);
+
+      Get.snackbar("Success", "Sensor data uploaded successfully",
+          snackPosition: SnackPosition.BOTTOM);
       clearFields();
+
     } catch (e) {
       Get.snackbar("Error", e.toString(), snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading.value = false;
     }
   }
+
+
+
 
   void clearFields() {
     selectedApartmentName.value = "";

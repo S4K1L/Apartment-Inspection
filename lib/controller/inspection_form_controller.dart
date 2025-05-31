@@ -68,7 +68,6 @@ class InspectionFormController extends GetxController {
         'comment': commentController.text,
         'interventionLevel': selectedInterventionLevel.value,
         'imageUrl': imageUrl ?? '',
-        'date': dateController.text,
       };
 
       final query = await _firestore

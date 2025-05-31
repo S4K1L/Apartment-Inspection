@@ -11,30 +11,27 @@ class ApartmentModel {
     required this.apartmentName,
   });
 
+  /// Creates an ApartmentModel from Firestore document data
   factory ApartmentModel.fromMap(Map<String, dynamic> map, String docId) {
     return ApartmentModel(
       id: docId,
       apartmentNumber: map['apartmentNumber'] ?? '',
       apartmentUnit: map['apartmentUnit'] ?? '',
-      apartmentName: map['apartmentName'],
+      apartmentName: map['apartmentName'] ?? '',
     );
   }
 
+  /// Converts the model into a Map for saving to Firestore
   Map<String, dynamic> toMap() {
     return {
       'apartmentNumber': apartmentNumber,
-      'apartment': apartmentUnit,
+      'apartmentUnit': apartmentUnit,
       'apartmentName': apartmentName,
     };
   }
 
+  /// Optionally support creating a model from Firestore data
   factory ApartmentModel.fromFirestore(Map<String, dynamic> data, String docId) {
-    return ApartmentModel(
-      id: docId,
-      apartmentName: data['apartmentName'] ?? '',
-      apartmentNumber: data['apartmentNumber'] ?? '',
-      apartmentUnit: data['apartmentUnit'] ?? '',
-    );
+    return ApartmentModel.fromMap(data, docId);
   }
-
-  }
+}

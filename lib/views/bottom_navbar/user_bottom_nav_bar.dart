@@ -1,5 +1,5 @@
 import 'package:apartmentinspection/utils/theme/colors.dart';
-import 'package:apartmentinspection/views/user/home.dart';
+import 'package:apartmentinspection/views/user/home/home.dart';
 import 'package:apartmentinspection/views/profile/profile.dart';
 import 'package:apartmentinspection/views/user/report.dart';
 import 'package:flutter/cupertino.dart';

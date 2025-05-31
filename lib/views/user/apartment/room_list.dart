@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../../controller/inspection_form_controller.dart';
 import 'inspection_form.dart';
+import 'inspection_list.dart';
 
 class RoomListPage extends StatefulWidget {
   final String apartmentNumber;
@@ -27,18 +29,18 @@ class _RoomListPageState extends State<RoomListPage> {
   int selectedIndex = -1;
 
   final List<Map<String, String>> rooms = [
-    {"fr": "Chambre à coucher", "en": "Bed Room"},
-    {"fr": "Salles de bain", "en": "Bathrooms"},
-    {"fr": "Saile de lavage", "en": "Laundry Room"},
-    {"fr": "Cuioine", "en": "Kitchen"},
-    {"fr": "Salle mécanique", "en": "Mechanical Room"},
-    {"fr": "Saile mécanique / Divers", "en": "Miscellaneous"},
-    {"fr": "Sailerourovad", "en": "Ovenvation"},
-    {"fr": "Cuich ge", "en": ""},
+    {"fr": "SALLE DE BAINS 1", "en": "BATHROOM 1"},
+    {"fr": " SALLE DE BAINS 2", "en": "BATHROOM 2"},
+    {"fr": "TOILETTE 1", "en": "TOILETTE 1"},
+    {"fr": "TOILETTE 2", "en": "TOILETTE 2"},
+    {"fr": "CUISINE", "en": "CUISINE"},
+    {"fr": "Salle mécanique / lavage", "en": "Mechanical room/washing"},
+    {"fr": "Diversas", "en": "Divers"},
   ];
 
   @override
   Widget build(BuildContext context) {
+    final InspectionFormController controller = Get.put(InspectionFormController());
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
@@ -51,7 +53,7 @@ class _RoomListPageState extends State<RoomListPage> {
           ),
           Image.asset(Const.logo),
           SizedBox(width: 8.sp),
-          Text("PRE${widget.apartmentNumber}",
+          Text("INSPECCIÓN",
               style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold)),
           const Spacer(),
           Image.asset(Const.bar, height: 26.sp),
@@ -66,6 +68,8 @@ class _RoomListPageState extends State<RoomListPage> {
             children: [
               _buildHeader(widget.apartmentNumber, widget.apartmentUnit),
               SizedBox(height: 24.h),
+              _buildTextField(controller),
+              SizedBox(height: 24.h),
               ...List.generate(
                 rooms.length,
                 (index) => _buildRoomTile(
@@ -73,12 +77,17 @@ class _RoomListPageState extends State<RoomListPage> {
                     setState(() {
                       selectedIndex = index;
                     });
+                    // Get.to(
+                    //     () => InspectionFormPage(
+                    //           apartmentNumber: widget.apartmentNumber,
+                    //           apartmentUnit: widget.apartmentUnit,
+                    //           roomName: rooms[index]["en"].toString(),
+                    //           apartmentName: widget.apartmentName,
+                    //         ),
+                    //     transition: Transition.rightToLeft);
                     Get.to(
-                        () => InspectionFormPage(
-                              apartmentNumber: widget.apartmentNumber,
-                              apartmentUnit: widget.apartmentUnit,
+                        () => InspectionListPage(
                               roomName: rooms[index]["en"].toString(),
-                              apartmentName: widget.apartmentName,
                             ),
                         transition: Transition.rightToLeft);
                   },
@@ -171,6 +180,45 @@ class _RoomListPageState extends State<RoomListPage> {
             const Icon(Icons.arrow_forward_ios, color: kBlackColor),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(InspectionFormController controller) {
+    return TextField(
+      controller: controller.dateController,
+      readOnly: true,
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+          context: Get.context!,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2101),
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: const ColorScheme.light(
+                  primary: kPrimaryColor, // customize as needed
+                  onPrimary: Colors.white,
+                  onSurface: Colors.black,
+                ),
+              ),
+              child: child!,
+            );
+          },
+        );
+        if (pickedDate != null) {
+          controller.dateController.text =
+          "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+        }
+      },
+      decoration: InputDecoration(
+        hintText: "Date de l’inspection",
+        filled: true,
+        fillColor: kBackGroundColor,
+        suffixIcon: const Icon(Icons.calendar_today),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        //border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

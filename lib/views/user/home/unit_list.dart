@@ -11,33 +11,52 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 
-class HomePage extends StatelessWidget {
+class UnitListPage extends StatefulWidget {
+  final String apartmentName;
+  const UnitListPage({super.key, required this.apartmentName});
+
+  @override
+  State<UnitListPage> createState() => _UnitListPageState();
+}
+
+class _UnitListPageState extends State<UnitListPage> {
   final ApartmentController controller = Get.put(ApartmentController());
 
-  HomePage({super.key});
+  @override
+  void dispose() {
+    controller.unitList.clear();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    // Fetch only when list is empty
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.unitList.isEmpty) {
+        controller.fetchAllUnits(widget.apartmentName);
+      }
+    });
     return Scaffold(
       backgroundColor: kBackGroundColor,
       appBar: AppBar(
         backgroundColor: kWhiteColor,
         automaticallyImplyLeading: false,
+        leading: IconButton(onPressed: (){
+          Get.back();
+        }, icon: const Icon(Icons.arrow_back_ios_new,color: kBlackColor,)),
+        title: Text("Unit List",
+            style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold)),
+        centerTitle: true,
         actions: [
-          SizedBox(width: 8.sp),
-          Image.asset(Const.logo),
-          SizedBox(width: 8.sp),
-          Text("APARTMENT",
-              style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold)),
-          const Spacer(),
           Image.asset(Const.bar, height: 26.sp),
-          SizedBox(width: 8.sp),
+          const SizedBox(width: 10,)
         ],
       ),
       body: Stack(
         children: [
           _buildBackground(),
-          Bounce(
+          BounceInRight(
             duration: const Duration(milliseconds: 700),
             child: Column(
               children: [
@@ -51,18 +70,18 @@ class HomePage extends StatelessWidget {
                           size: 50.0,
                         ),
                       );
-                    } else if (controller.filteredList.isEmpty) {
-                      return const Center(child: Text("No apartments found."));
+                    } else if (controller.unitList.isEmpty) {
+                      return const Center(child: Text("No units found."));
                     }
                     return RefreshIndicator(
-                      onRefresh: () async => controller.fetchApartments(),
+                      onRefresh: () async => controller.fetchAllUnits(widget.apartmentName),
                       color: kPrimaryColor,
                       backgroundColor: Colors.white,
                       child: ListView.builder(
                         padding: const EdgeInsets.all(16),
-                        itemCount: controller.filteredList.length,
+                        itemCount: controller.filteredList.length, // ✅ use filteredList
                         itemBuilder: (context, index) {
-                          final apartment = controller.filteredList[index];
+                          final apartment = controller.filteredList[index]; // ✅ use filteredList
                           return ApartmentCard(
                             number: apartment.apartmentNumber,
                             unit: apartment.apartmentUnit,

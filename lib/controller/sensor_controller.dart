@@ -24,7 +24,7 @@ class SensorController extends GetxController {
 
       for (var apartmentDoc in apartmentSnapshot.docs) {
         final sensorSnapshot = await apartmentDoc.reference
-            .collection('sensor')
+            .collection('sensors')
             .where('isDone', isEqualTo: false)
             .orderBy(FieldPath.documentId, descending: true)
             .limit(1)

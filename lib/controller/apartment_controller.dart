@@ -4,7 +4,8 @@ import '../../models/apartment_model.dart';
 
 class ApartmentController extends GetxController {
   var isLoading = true.obs;
-  var apartmentList = <ApartmentModel>[].obs;
+  var apartmentList = <String>[].obs;
+  var unitList = <ApartmentModel>[].obs;
   var filteredList = <ApartmentModel>[].obs;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -14,29 +15,74 @@ class ApartmentController extends GetxController {
     super.onInit();
   }
 
+  /// Fetch unique apartment names from /apartments_data/
   void fetchApartments() async {
     try {
       isLoading(true);
+      apartmentList.clear();
+
       final snapshot = await _firestore.collection('apartments').get();
-      apartmentList.value = snapshot.docs.map((doc) {
-        return ApartmentModel.fromMap(doc.data(), doc.id);
-      }).toList();
-      filteredList.value = apartmentList;
+
+      final Set<String> apartmentNames = {};
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        if (data.containsKey("apartmentName")) {
+          apartmentNames.add(data["apartmentName"]);
+        }
+      }
+
+      if (apartmentNames.isEmpty) {
+        print("⭕️ No apartments found.");
+      } else {
+        print("✅ Apartments found: ${apartmentNames.length}");
+      }
+      apartmentList.value = apartmentNames.toList();
     } catch (e) {
-      Get.snackbar("Error", "Failed to fetch data: $e");
+      print("❌ Firestore error: $e");
+      Get.snackbar("Error", "Failed to fetch apartments: $e");
     } finally {
       isLoading(false);
     }
   }
 
+  /// Fetch all units in /apartments_data/ with matching apartmentName
+  void fetchAllUnits(String apartmentName) async {
+    try {
+      isLoading(true);
+      unitList.clear();
+
+      final snapshot = await _firestore
+          .collection('apartments')
+          .where('apartmentName', isEqualTo: apartmentName)
+          .get();
+
+      final units = snapshot.docs.map((doc) {
+        return ApartmentModel.fromMap(doc.data(), doc.id);
+      }).toList();
+
+      unitList.value = units;
+      filteredList.value = units;
+
+      print("✅ Fetched ${units.length} units for '$apartmentName'");
+    } catch (e) {
+      print("❌ Failed to fetch units: $e");
+      Get.snackbar("Error", "Failed to fetch units: $e");
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  /// Filter units by apartment name, unit, or number
   void filterApartments(String query) {
     if (query.isEmpty) {
-      filteredList.value = apartmentList;
+      filteredList.value = unitList;
     } else {
       final q = query.toLowerCase();
-      filteredList.value = apartmentList.where((apartment) {
-        return apartment.apartmentNumber.toLowerCase().contains(q) ||
-            apartment.apartmentUnit.toLowerCase().contains(q) || apartment.apartmentName.toLowerCase().contains(q);
+      filteredList.value = unitList.where((unit) {
+        return unit.apartmentName.toLowerCase().contains(q) ||
+            unit.apartmentUnit.toLowerCase().contains(q) ||
+            unit.apartmentNumber.toLowerCase().contains(q);
       }).toList();
     }
   }
