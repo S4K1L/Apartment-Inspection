@@ -25,12 +25,42 @@ class InspectionFormController extends GetxController {
     selectedInterventionLevel.value = level;
   }
 
-  Future<void> pickImages() async {
-    final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles.isNotEmpty) {
-      selectedImages.addAll(pickedFiles.map((e) => File(e.path)));
-    }
+  Future<void> pickImageSource(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Take a photo'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+                  if (pickedFile != null) {
+                    selectedImages.add(File(pickedFile.path));
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text('Pick from gallery'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final pickedFiles = await _picker.pickMultiImage();
+                  if (pickedFiles.isNotEmpty) {
+                    selectedImages.addAll(pickedFiles.map((e) => File(e.path)));
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
+
 
   void removeImage(int index) {
     if (index >= 0 && index < selectedImages.length) {
@@ -51,6 +81,7 @@ class InspectionFormController extends GetxController {
     required String? apartmentNumber,
     required String? apartmentUnit,
     required String? apartmentName,
+    required String? checkingName,
   }) async {
     if (commentController.text.isEmpty) {
       Get.snackbar("Error", "Comment is required for the room");
@@ -65,6 +96,7 @@ class InspectionFormController extends GetxController {
       final imageUrl = await uploadImage(imageToUpload);
 
       final entry = {
+        'checkingName': checkingName,
         'comment': commentController.text,
         'interventionLevel': selectedInterventionLevel.value,
         'imageUrl': imageUrl ?? '',

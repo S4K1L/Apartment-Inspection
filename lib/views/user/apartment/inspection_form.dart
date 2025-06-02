@@ -7,10 +7,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class InspectionFormPage extends StatelessWidget {
-  final InspectionFormController controller = Get.put(InspectionFormController());
+  final InspectionFormController controller =
+      Get.put(InspectionFormController());
   final String apartmentNumber;
   final String apartmentUnit;
   final String roomName;
+  final String checkingName;
   final String apartmentName;
 
   InspectionFormPage({
@@ -19,6 +21,7 @@ class InspectionFormPage extends StatelessWidget {
     required this.apartmentUnit,
     required this.apartmentName,
     required this.roomName,
+    required this.checkingName,
   });
 
   @override
@@ -35,9 +38,7 @@ class InspectionFormPage extends StatelessWidget {
         title: Text(
           "Inspection Form",
           style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-              color: kBlackColor),
+              fontSize: 20.sp, fontWeight: FontWeight.bold, color: kBlackColor),
         ),
         centerTitle: true,
         actions: [
@@ -50,7 +51,7 @@ class InspectionFormPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(apartmentNumber, apartmentUnit),
+            _buildHeader(),
             SizedBox(height: 20.h),
             _buildSectionTitle(Icons.comment, "Commentaire / Comment"),
             _buildCommentsField(maxLines: 4),
@@ -69,19 +70,23 @@ class InspectionFormPage extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: FinishedButton(
           onPress: () {
-            controller.addRoomEntry(roomName,
-                apartmentNumber: apartmentNumber,
-                apartmentUnit: apartmentUnit,
-                apartmentName: apartmentName);
+            controller.addRoomEntry(
+              roomName,
+              apartmentNumber: apartmentNumber,
+              apartmentUnit: apartmentUnit,
+              apartmentName: apartmentName,
+              checkingName: checkingName,
+            );
             Get.back();
           },
-          title: "Suivante",
+          title: "Submit",
+          icon: Icons.drive_folder_upload_outlined,
         ),
       ),
     );
   }
 
-  Widget _buildHeader(String number, String unite) {
+  Widget _buildHeader() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 2,
@@ -94,7 +99,7 @@ class InspectionFormPage extends StatelessWidget {
             SizedBox(width: 10.w),
             Expanded(
               child: Text(
-                roomName,
+                checkingName,
                 style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
@@ -157,7 +162,7 @@ class InspectionFormPage extends StatelessWidget {
     return Obx(() {
       if (controller.selectedImages.isEmpty) {
         return GestureDetector(
-          onTap: controller.pickImages,
+          onTap:() async => controller.pickImageSource(context),
           child: const DottedBorderContainer(),
         );
       } else {

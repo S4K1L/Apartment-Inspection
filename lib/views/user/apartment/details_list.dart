@@ -6,9 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class InspectionListPage extends StatelessWidget {
+import 'inspection_form.dart';
+
+class DetailsListPage extends StatelessWidget {
+  final String apartmentNumber;
+  final String apartmentUnit;
+  final String apartmentName;
   final String roomName;
-  InspectionListPage({super.key, required this.roomName});
+
+  DetailsListPage(
+      {super.key,
+      required this.roomName,
+      required this.apartmentNumber,
+      required this.apartmentUnit,
+      required this.apartmentName});
 
   final List<RoomInspectionModel> rooms = [
     RoomInspectionModel(
@@ -107,15 +118,22 @@ class InspectionListPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: kWhiteColor,
         automaticallyImplyLeading: false,
-        leading: IconButton(onPressed: (){
-          Get.back();
-        }, icon: const Icon(Icons.arrow_back_ios_new,color: kBlackColor,)),
-        title: Text("Room Details",
+        leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: kBlackColor,
+            )),
+        title: Text("Details",
             style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold)),
         centerTitle: true,
         actions: [
           Image.asset(Const.bar, height: 26.sp),
-          const SizedBox(width: 10,)
+          const SizedBox(
+            width: 10,
+          )
         ],
       ),
       body: selectedRoom == null
@@ -128,23 +146,24 @@ class InspectionListPage extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: kPrimaryColor
-                    ),
+                        borderRadius: BorderRadius.circular(8),
+                        color: kPrimaryColor),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Column(
                         children: [
                           Text(
                             selectedRoom.fr,
-                            style:
-                            TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold,color: kWhiteColor),
+                            style: TextStyle(
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.bold,
+                                color: kWhiteColor),
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
                             selectedRoom.en,
                             style:
-                            TextStyle(fontSize: 16.sp, color: kWhiteColor),
+                                TextStyle(fontSize: 16.sp, color: kWhiteColor),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -158,7 +177,17 @@ class InspectionListPage extends StatelessWidget {
                       separatorBuilder: (_, __) => SizedBox(height: 8.h),
                       itemBuilder: (context, index) {
                         return _buildRoomTile(
-                          onPress: (){},
+                          onPress: () {
+                            Get.to(
+                                () => InspectionFormPage(
+                                      apartmentNumber: apartmentNumber,
+                                      apartmentUnit: apartmentUnit,
+                                      roomName: roomName,
+                                      apartmentName: apartmentName,
+                                      checkingName: selectedRoom.checklist[index],
+                                    ),
+                                transition: Transition.rightToLeft);
+                          },
                           fr: selectedRoom.checklist[index],
                         );
                       },
@@ -167,17 +196,6 @@ class InspectionListPage extends StatelessWidget {
                 ],
               ),
             ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: FinishedButton(
-          onPress: () {
-            // Move to next screen or save
-            Get.snackbar(
-                "Next", "Checklist reviewed for ${selectedRoom?.en ?? ''}");
-          },
-          title: "Suivante",
-        ),
-      ),
     );
   }
 
@@ -205,9 +223,9 @@ class InspectionListPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(fr,
-                style: TextStyle(
-                    fontSize: 18.sp, fontWeight: FontWeight.w600),
+            Text(
+              fr,
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
             ),
@@ -216,5 +234,4 @@ class InspectionListPage extends StatelessWidget {
       ),
     );
   }
-
 }

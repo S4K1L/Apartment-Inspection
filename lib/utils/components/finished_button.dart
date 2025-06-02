@@ -5,11 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class FinishedButton extends StatelessWidget {
   final String title;
   final VoidCallback onPress;
+  final IconData icon;
 
   const FinishedButton({
     super.key,
     required this.title,
-    required this.onPress,
+    required this.onPress, required this.icon,
   });
 
   @override
@@ -23,9 +24,16 @@ class FinishedButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 14.h),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         ),
-        child: Text(title, style: const TextStyle(color: Colors.white)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon,color: kWhiteColor,size: 26.sp),
+            SizedBox(width: 8.sp),
+            Text(title, style: TextStyle(color: Colors.white,fontSize: 16.sp)),
+          ],
+        ),
       ),
     );
   }

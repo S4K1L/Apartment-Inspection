@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 
 import '../../../controller/inspection_form_controller.dart';
 import 'inspection_form.dart';
-import 'inspection_list.dart';
+import 'details_list.dart';
 
 class RoomListPage extends StatefulWidget {
   final String apartmentNumber;
@@ -40,7 +40,8 @@ class _RoomListPageState extends State<RoomListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final InspectionFormController controller = Get.put(InspectionFormController());
+    final InspectionFormController controller =
+        Get.put(InspectionFormController());
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
@@ -77,17 +78,12 @@ class _RoomListPageState extends State<RoomListPage> {
                     setState(() {
                       selectedIndex = index;
                     });
-                    // Get.to(
-                    //     () => InspectionFormPage(
-                    //           apartmentNumber: widget.apartmentNumber,
-                    //           apartmentUnit: widget.apartmentUnit,
-                    //           roomName: rooms[index]["en"].toString(),
-                    //           apartmentName: widget.apartmentName,
-                    //         ),
-                    //     transition: Transition.rightToLeft);
                     Get.to(
-                        () => InspectionListPage(
+                        () => DetailsListPage(
                               roomName: rooms[index]["en"].toString(),
+                              apartmentNumber: widget.apartmentNumber,
+                              apartmentUnit: widget.apartmentUnit,
+                              apartmentName: widget.apartmentName,
                             ),
                         transition: Transition.rightToLeft);
                   },
@@ -112,7 +108,7 @@ class _RoomListPageState extends State<RoomListPage> {
                     ),
                 transition: Transition.rightToLeft);
           },
-          title: "Suivante",
+          title: "DONE", icon: Icons.done_all,
         ),
       ),
     );
@@ -209,7 +205,7 @@ class _RoomListPageState extends State<RoomListPage> {
         );
         if (pickedDate != null) {
           controller.dateController.text =
-          "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+              "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
         }
       },
       decoration: InputDecoration(

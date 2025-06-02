@@ -154,6 +154,7 @@ class _SignaturePageState extends State<SignaturePage> {
         child: FinishedButton(
           onPress: handleSubmit,
           title: "FAITE",
+          icon: Icons.sign_language,
         ),
       ),
     );
