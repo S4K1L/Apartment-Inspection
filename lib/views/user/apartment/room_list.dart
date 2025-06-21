@@ -108,7 +108,7 @@ class _RoomListPageState extends State<RoomListPage> {
                     ),
                 transition: Transition.rightToLeft);
           },
-          title: "DONE", icon: Icons.done_all,
+          title: "Signature", icon: Icons.sign_language_outlined,
         ),
       ),
     );

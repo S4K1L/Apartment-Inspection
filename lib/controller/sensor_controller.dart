@@ -7,18 +7,23 @@ class SensorController extends GetxController {
   var sensorUnits = <SensorUnit>[].obs;
   var allSensorUnits = <SensorUnit>[].obs; // Store all units
   final observationController = TextEditingController();
+  RxBool isLoading = false.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchFromFirebase();
+  void updateSensorUnit(int index, SensorUnit updatedUnit) {
+    if (index < sensorUnits.length) {
+      sensorUnits[index] = updatedUnit;
+      sensorUnits.refresh();
+    }
   }
 
+
+
   // 0. Fetch sensor data where isDone == false
-  Future<void> fetchFromFirebase() async {
+  Future<void> fetchFromFirebase(String apartmentName) async {
+    isLoading.value = true;
     try {
       final apartmentSnapshot =
-          await FirebaseFirestore.instance.collection('apartments').get();
+          await FirebaseFirestore.instance.collection('apartments').where('apartmentName', isEqualTo: apartmentName).get();
 
       List<SensorUnit> allUnits = [];
 
@@ -43,7 +48,9 @@ class SensorController extends GetxController {
 
       allSensorUnits.assignAll(allUnits);
       sensorUnits.assignAll(allUnits);
+      isLoading.value = false;
     } catch (e) {
+      isLoading.value = false;
       print('Error fetching sensor data: $e');
     }
   }
@@ -87,7 +94,6 @@ class SensorController extends GetxController {
           .set(updatedUnit.toMap());
 
       Get.snackbar("Success", "Sensor data updated");
-      fetchFromFirebase();
     } catch (e) {
       print("Error saving sensor data: $e");
       Get.snackbar("Error", "Failed to update sensor data");
@@ -102,6 +108,7 @@ class SensorController extends GetxController {
       return diff >= 0 && diff <= 30;
     }).toList();
   }
+
 
   void searchFilter(String query) {
     if (query.isEmpty) {

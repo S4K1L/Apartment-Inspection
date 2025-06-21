@@ -7,16 +7,17 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../controller/battery_history_controller.dart';
-import 'battery_history_details_page.dart';
+import 'sensor_history_details_page.dart';
 
-class SensorHistoryPage extends StatelessWidget {
-  final controller = Get.put(BatteryHistoryController());
+class SensorHistoryList extends StatelessWidget {
+  final String apartmentName;
+  final BatteryHistoryController controller = Get.put(BatteryHistoryController());
 
-  SensorHistoryPage({super.key});
+  SensorHistoryList({super.key, required this.apartmentName});
 
   @override
   Widget build(BuildContext context) {
-    controller.fetchApartments();
+    controller.fetchApartments(apartmentName);
 
     return Scaffold(
       backgroundColor: kBackGroundColor,
@@ -39,12 +40,27 @@ class SensorHistoryPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  "Battery History",
-                  style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold, color: kWhiteColor),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Get.back();
+                      },
+                      icon: const Icon(Icons.arrow_back_ios, color: kWhiteColor),
+                    ),
+                    Text(
+                      "Sensor History",
+                      style: TextStyle(
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.bold,
+                        color: kWhiteColor,
+                      ),
+                    ),
+                    Image.asset(Const.bar, height: 26.sp, color: kWhiteColor),
+                  ],
                 ),
                 SizedBox(height: 12.h),
-                // Search bar
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -73,20 +89,21 @@ class SensorHistoryPage extends StatelessWidget {
             ),
           ),
           Obx(() {
-            final apartments = controller.filteredApartments; // <== Use filtered list
-
+            final apartments = controller.filteredApartments;
             if (controller.isLoading.value) {
               return const Expanded(
-                child: Center(child: SpinKitWave(
-                  color: kPrimaryColor,
-                  size: 50.0,
-                ),),
+                child: Center(
+                  child: SpinKitWave(
+                    color: kPrimaryColor,
+                    size: 50.0,
+                  ),
+                ),
               );
             }
 
             return Expanded(
               child: RefreshIndicator(
-                onRefresh: () => controller.fetchApartments(),
+                onRefresh: () => controller.fetchApartments(apartmentName),
                 color: kPrimaryColor,
                 child: BounceInRight(
                   duration: const Duration(milliseconds: 700),
@@ -98,12 +115,11 @@ class SensorHistoryPage extends StatelessWidget {
                       itemCount: apartments.length,
                       itemBuilder: (context, index) {
                         final apartment = apartments[index];
-
                         return GestureDetector(
-                          onTap: () {
-                            controller.fetchSensorHistory(apartment.apartmentUnit);
+                          onTap: () async {
+                            await controller.fetchSensorHistory(apartment.apartmentUnit);
                             Get.to(
-                                  () => BatteryHistoryDetailPage(apartmentUnit: apartment.apartmentUnit),
+                                  () => SensorHistoryDetailPage(apartmentUnit: apartment.apartmentUnit),
                               transition: Transition.rightToLeft,
                             );
                           },
@@ -121,7 +137,7 @@ class SensorHistoryPage extends StatelessWidget {
                                   color: Colors.black12,
                                   offset: Offset(0, 6),
                                   blurRadius: 10,
-                                )
+                                ),
                               ],
                             ),
                             child: Row(
@@ -179,9 +195,7 @@ class SensorHistoryPage extends StatelessWidget {
                 ),
               ),
             );
-          })
-
-
+          }),
         ],
       ),
     );

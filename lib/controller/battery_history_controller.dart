@@ -2,6 +2,7 @@ import 'package:apartmentinspection/models/battery_history_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import '../models/apartment_model.dart';
+import '../models/sensor_model.dart';
 
 class BatteryHistoryController extends GetxController {
   final _firestore = FirebaseFirestore.instance;
@@ -16,11 +17,11 @@ class BatteryHistoryController extends GetxController {
   RxBool isLoading = false.obs;
 
   /// Fetch all apartments from Firestore and initialize filtered list
-  Future<void> fetchApartments() async {
+  Future<void> fetchApartments(String apartmentName) async {
     try {
       isLoading.value = true;
 
-      final snapshot = await _firestore.collection('apartments').get();
+      final snapshot = await _firestore.collection('apartments').where('apartmentName', isEqualTo: apartmentName).get();
 
       final fetchedApartments = snapshot.docs
           .map((doc) => ApartmentModel.fromFirestore(doc.data(), doc.id))
@@ -28,10 +29,10 @@ class BatteryHistoryController extends GetxController {
 
       apartments.assignAll(fetchedApartments);
       filteredApartments.assignAll(fetchedApartments);
-    } catch (e) {
-      print("Error fetching apartments: $e");
-    } finally {
       isLoading.value = false;
+    } catch (e) {
+      isLoading.value = false;
+      print("Error fetching apartments: $e");
     }
   }
 
@@ -93,4 +94,5 @@ class BatteryHistoryController extends GetxController {
       );
     }
   }
+
 }

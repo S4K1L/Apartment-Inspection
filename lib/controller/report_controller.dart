@@ -1,3 +1,4 @@
+import 'package:apartmentinspection/controller/login_controller.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 
 class ReportController extends GetxController {
+  final controller = Get.put(LoginController());
   final reports = [].obs;
   final isLoading = false.obs;
   final _firestore = FirebaseFirestore.instance;
@@ -42,19 +44,17 @@ class ReportController extends GetxController {
 
     final fontData = await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
     final ttf = pw.Font.ttf(fontData);
-
     final logo = await rootBundle.load(Const.logo);
 
     Uint8List? techSignature;
     Uint8List? clientSignature;
     if (report['signatures'] != null) {
       techSignature =
-          await networkImageToBytes(report['signatures']['technician']);
+      await networkImageToBytes(report['signatures']['technician']);
       clientSignature =
-          await networkImageToBytes(report['signatures']['client']);
+      await networkImageToBytes(report['signatures']['client']);
     }
 
-    // Preload all room entry images
     final roomWidgets = <pw.Widget>[];
     for (var room in report['rooms']) {
       final entryWidgets = <pw.Widget>[];
@@ -64,9 +64,7 @@ class ReportController extends GetxController {
         if (entry['imageUrl'] != null) {
           try {
             imageBytes = await networkImageToBytes(entry['imageUrl']);
-          } catch (_) {
-            // Fail silently if image fails to load
-          }
+          } catch (_) {}
         }
 
         entryWidgets.add(
@@ -75,15 +73,14 @@ class ReportController extends GetxController {
             child: pw.Row(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text(
-                  'Date: ${entry['date']}\nLevel: ${entry['interventionLevel']}\nComment: ${entry['comment']}',
-                  style: const pw.TextStyle(fontSize: 10),
+                pw.Expanded(
+                  child: pw.Text(
+                    'Checking: ${entry['checkingName'] ?? ''}\nLevel: ${entry['interventionLevel'] ?? ''}\nComment: ${entry['comment'] ?? ''}',
+                    style: const pw.TextStyle(fontSize: 10),
+                  ),
                 ),
-                if (imageBytes != null) ...[
-                  pw.Spacer(),
-                  pw.Image(pw.MemoryImage(imageBytes), height: 150, width: 150),
-                  pw.SizedBox(width: 10),
-                ],
+                if (imageBytes != null)
+                  pw.Image(pw.MemoryImage(imageBytes), height: 100, width: 100),
               ],
             ),
           ),
@@ -110,129 +107,139 @@ class ReportController extends GetxController {
       );
     }
 
-    // Now safe to build the PDF synchronously
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         theme: pw.ThemeData.withFont(base: ttf),
-        build: (context) {
-          return [
-            pw.Container(
-              color: PdfColors.blue200,
-              padding: const pw.EdgeInsets.all(12),
-              child: pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Text(
-                    'Apartment Inspection Report',
+        build: (context) => [
+          // Black Banner Header
+          pw.Container(
+            color: PdfColors.black,
+            padding: const pw.EdgeInsets.symmetric(vertical: 16),
+            width: double.infinity,
+            child: pw.Column(
+              children: [
+                pw.Text('Inspection report',
                     style: pw.TextStyle(
                       fontSize: 18,
-                      fontWeight: pw.FontWeight.bold,
                       color: PdfColors.white,
-                    ),
-                  ),
-                  pw.Image(pw.MemoryImage(logo.buffer.asUint8List()),
-                      width: 50),
-                ],
-              ),
-            ),
-            pw.SizedBox(height: 10),
-            pw.Center(
-              child: pw.Column(
-                children: [
-                  pw.Text(
-                      '${report['apartmentName']} : ${report['apartmentNumber']} - ${report['apartmentUnit']}',
-                      style: pw.TextStyle(
-                          fontSize: 16, fontWeight: pw.FontWeight.bold)),
-                  pw.Text('Covers summary, rooms, schedule and comments',
-                      style: const pw.TextStyle(fontSize: 10)),
-                ],
-              ),
-            ),
-            pw.SizedBox(height: 20),
-            pw.Row(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Expanded(
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      _infoCard('Date', report['inspectionDate']),
-                    ],
-                  ),
-                ),
-                pw.SizedBox(width: 20),
-                pw.Expanded(
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      _scheduleTable(report['schedule']),
-                      pw.SizedBox(height: 10),
-                      _timeTable(report['timeEstimates']),
-                    ],
-                  ),
-                ),
+                      fontWeight: pw.FontWeight.bold,
+                    )),
+                pw.Text('Vigilo prevention program',
+                    style: pw.TextStyle(
+                      fontSize: 12,
+                      color: PdfColors.white,
+                    )),
               ],
             ),
-            pw.SizedBox(height: 20),
-            pw.Text('Room Inspections',
-                style:
-                    pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
-            ...roomWidgets,
-            if (techSignature != null || clientSignature != null)
-              pw.Row(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
+          ),
+
+          pw.SizedBox(height: 20),
+
+          // Centered Logo
+          pw.Center(
+            child: pw.Image(pw.MemoryImage(logo.buffer.asUint8List()), height: 80),
+          ),
+
+          pw.Divider(),
+
+          // Inspection Location
+          pw.Text("Inspection location",
+              style: pw.TextStyle(
+                  fontWeight: pw.FontWeight.bold,
+                  fontSize: 12,
+                  decoration: pw.TextDecoration.underline),
+              textAlign: pw.TextAlign.center),
+          pw.SizedBox(height: 5),
+          pw.Text("Syndicat des copropriétaires ${report['apartmentName']} - Unit ${report['apartmentUnit']}",
+              style: const pw.TextStyle(fontSize: 11),
+              textAlign: pw.TextAlign.center),
+
+          pw.SizedBox(height: 20),
+
+          // Prepared By Section
+          pw.Text("Prepared by",
+              style: pw.TextStyle(
+                  fontWeight: pw.FontWeight.bold,
+                  fontSize: 12,
+                  decoration: pw.TextDecoration.underline),
+              textAlign: pw.TextAlign.center),
+          pw.SizedBox(height: 5),
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.center,
+            children: [
+              pw.Text(controller.user.value.name.toString()),
+              pw.Text("Montréal"),
+              pw.Text("5345 Rang du Bas St-François"),
+              pw.Text("Laval, Quebec"),
+              pw.Text("H7E 4P2"),
+              pw.Text("Tel: (514) 742-5933"),
+              pw.Text("RBQ: 5761-8506-01"),
+            ],
+          ),
+
+          pw.SizedBox(height: 20),
+          pw.Divider(),
+
+          // Footer
+          pw.SizedBox(height: 50),
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text("Inspection date: ${report['inspectionDate'] ?? 'N/A'}",
+                  style: pw.TextStyle(fontSize: 10)),
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.end,
                 children: [
-                  pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.SizedBox(height: 20),
-                        pw.Text("Signatures",
-                            style: pw.TextStyle(
-                                fontSize: 14, fontWeight: pw.FontWeight.bold)),
-                        pw.SizedBox(height: 10),
-                        if (techSignature != null)
-                          pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Text("Technician :"),
-                              pw.SizedBox(height: 10),
-                              pw.Image(pw.MemoryImage(techSignature),
-                                  height: 50),
-                            ],
-                          ),
-                      ]),
-                  pw.Spacer(),
-                  pw.Column(children: [
-                    if (clientSignature != null)
-                      pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.SizedBox(height: 40),
-                          pw.Text("Client :"),
-                          pw.SizedBox(height: 10),
-                          pw.Image(pw.MemoryImage(clientSignature), height: 50),
-                        ],
-                      ),
-                  ]),
+                  pw.Text("Report generated by TrackandFix.com",
+                      style: pw.TextStyle(fontSize: 8)),
                 ],
               ),
+            ],
+          ),
+
+          pw.SizedBox(height: 20),
+
+          // Room Inspections
+          if (roomWidgets.isNotEmpty)
+            pw.Text("Room Inspections",
+                style: pw.TextStyle(
+                    fontSize: 14, fontWeight: pw.FontWeight.bold)),
+          ...roomWidgets,
+
+          // Signatures
+          if (techSignature != null || clientSignature != null)
             pw.SizedBox(height: 20),
-            pw.Divider(),
-            pw.Center(
-              child: pw.Text(
-                'Generated by Apartment Inspection App',
-                style:
-                    pw.TextStyle(fontSize: 8, fontStyle: pw.FontStyle.italic),
-              ),
-            ),
-          ];
-        },
+          if (techSignature != null || clientSignature != null)
+            pw.Text("Signatures",
+                style: pw.TextStyle(
+                    fontSize: 14, fontWeight: pw.FontWeight.bold)),
+          pw.SizedBox(height: 10),
+          pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              if (techSignature != null)
+                pw.Column(children: [
+                  pw.Text("Technician:"),
+                  pw.SizedBox(height: 5),
+                  pw.Image(pw.MemoryImage(techSignature), height: 50),
+                ]),
+              pw.Spacer(),
+              if (clientSignature != null)
+                pw.Column(children: [
+                  pw.Text("Client:"),
+                  pw.SizedBox(height: 5),
+                  pw.Image(pw.MemoryImage(clientSignature), height: 50),
+                ]),
+            ],
+          ),
+        ],
       ),
     );
 
     return pdf.save();
   }
+
 
 // Helper for info blocks
   pw.Widget _infoCard(String title, String value) {

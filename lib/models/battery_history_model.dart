@@ -28,13 +28,21 @@ class SensorHistoryItem {
   });
 
   factory SensorHistoryItem.fromFirestore(String dateKey, Map<String, dynamic> data) {
+    DateTime? parsedDate;
+
+    if (data['lastUpdate'] is Timestamp) {
+      parsedDate = (data['lastUpdate'] as Timestamp).toDate();
+    } else if (data['lastUpdate'] is String) {
+      parsedDate = DateTime.tryParse(data['lastUpdate']);
+    }
+
     return SensorHistoryItem(
       dateKey: dateKey,
       apartmentName: data['apartmentName'] ?? '',
       apartmentNumber: data['apartmentNumber'] ?? '',
       apartmentUnit: data['apartmentUnit'] ?? '',
       isDone: data['isDone'] ?? false,
-      lastUpdate: (data['lastUpdate'] as Timestamp?)?.toDate(),
+      lastUpdate: parsedDate,
       observations: data['observations'],
       regularSensors: data['regularSensors'] ?? 0,
       threeFeetCables: data['threeFeetCables'] ?? 0,
@@ -42,4 +50,6 @@ class SensorHistoryItem {
       sensorStatus: List<bool>.from(data['sensorStatus'] ?? []),
     );
   }
+
+
 }

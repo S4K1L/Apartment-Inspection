@@ -55,6 +55,7 @@ class ApartmentController extends GetxController {
       final snapshot = await _firestore
           .collection('apartments')
           .where('apartmentName', isEqualTo: apartmentName)
+          .orderBy('apartmentUnit', descending: false)
           .get();
 
       final units = snapshot.docs.map((doc) {

@@ -163,7 +163,7 @@ class DetailsListPage extends StatelessWidget {
                           Text(
                             selectedRoom.en,
                             style:
-                                TextStyle(fontSize: 16.sp, color: kWhiteColor),
+                            TextStyle(fontSize: 16.sp, color: kWhiteColor),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],

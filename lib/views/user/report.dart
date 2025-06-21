@@ -86,7 +86,7 @@ class ReportPage extends StatelessWidget {
                   );
                 }
 
-                if (controller.reports.isEmpty) {
+                if (controller.reports.isEmpty && controller.isLoading.value) {
                   return const Center(child: Text("No reports found"));
                 }
 

@@ -6,8 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:signature/signature.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+import '../utils/constant/const.dart' show Const;
+import '../views/user/pdf/send_pdf.dart';
+import 'login_controller.dart';
 
 class InspectionFormController extends GetxController {
+  final LoginController controller = Get.put(LoginController());
   final commentController = TextEditingController();
   final dateController = TextEditingController();
   final interventionLevelController = TextEditingController();
@@ -153,7 +163,7 @@ class InspectionFormController extends GetxController {
 
       // Track local state
       roomEntries.putIfAbsent(roomName, () => []).add(entry);
-
+      Get.back();
       // Reset fields
       commentController.clear();
       dateController.clear();
@@ -262,7 +272,7 @@ class InspectionFormController extends GetxController {
       Get.snackbar("Error", "Please complete both signatures.");
       return;
     }
-
+    User? user = FirebaseAuth.instance.currentUser;
     try {
       isLoading.value = true;
 
@@ -312,15 +322,293 @@ class InspectionFormController extends GetxController {
           'client': clientUrl,
         },
         'inspectionStatus': 'Done',
+        'inspectedBy': user?.uid,
         'updatedAt': Timestamp.now(),
       });
 
-      Get.snackbar("Success", "Signatures submitted successfully.");
-      Get.back();
+      final reportSnapshot = await reportDoc.get();
+      await generateAndUploadPdf(
+        reportId: reportDoc.id,
+        report: reportSnapshot.data() as Map<String, dynamic>,
+      );
+
+      // Fetch updated PDF URL
+      final updatedSnapshot = await reportDoc.get();
+      final updatedData = updatedSnapshot.data() as Map<String, dynamic>;
+      final pdfUrl = updatedData['pdfUrl'];
+
+      // Navigate to SendPdfPage
+      Get.snackbar("Success", "PDF report generated");
+      Get.to(() => SendPdfPage(pdfUrl: pdfUrl));
     } catch (e) {
       Get.snackbar("Error", "Signature upload failed: $e");
     } finally {
       isLoading.value = false;
     }
   }
+
+  Future<Uint8List> networkImageToBytes(String url) async {
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      return response.bodyBytes;
+    } else {
+      throw Exception("Failed to load image from $url");
+    }
+  }
+
+
+  Future<void> generateAndUploadPdf({
+    required String reportId,
+    required Map<String, dynamic> report,
+  }) async {
+    try {
+      final pdf = pw.Document();
+      final fontData = await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
+      final ttf = pw.Font.ttf(fontData);
+
+      // Example simple content (replace with your detailed layout)
+      final logo = await rootBundle.load(Const.logo);
+
+      Uint8List? techSignature;
+      Uint8List? clientSignature;
+      if (report['signatures'] != null) {
+        techSignature =
+        await networkImageToBytes(report['signatures']['technician']);
+        clientSignature =
+        await networkImageToBytes(report['signatures']['client']);
+      }
+
+      final roomWidgets = <pw.Widget>[];
+      for (var room in report['rooms']) {
+        final entryWidgets = <pw.Widget>[];
+
+        for (var entry in room['entries']) {
+          Uint8List? imageBytes;
+          if (entry['imageUrl'] != null) {
+            try {
+              imageBytes = await networkImageToBytes(entry['imageUrl']);
+            } catch (_) {}
+          }
+
+          entryWidgets.add(
+            pw.Container(
+              margin: const pw.EdgeInsets.only(bottom: 8),
+              child: pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Expanded(
+                    child: pw.Text(
+                      'Checking: ${entry['checkingName'] ?? ''}\nLevel: ${entry['interventionLevel'] ?? ''}\nComment: ${entry['comment'] ?? ''}',
+                      style: const pw.TextStyle(fontSize: 10),
+                    ),
+                  ),
+                  if (imageBytes != null)
+                    pw.Image(pw.MemoryImage(imageBytes), height: 100, width: 100),
+                ],
+              ),
+            ),
+          );
+        }
+
+        roomWidgets.add(
+          pw.Container(
+            margin: const pw.EdgeInsets.symmetric(vertical: 5),
+            padding: const pw.EdgeInsets.all(8),
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: PdfColors.grey400),
+              borderRadius: pw.BorderRadius.circular(4),
+            ),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(room['roomName'],
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                ...entryWidgets,
+              ],
+            ),
+          ),
+        );
+      }
+
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          theme: pw.ThemeData.withFont(base: ttf),
+          build: (context) => [
+            // Black Banner Header
+            pw.Container(
+              color: PdfColors.black,
+              padding: const pw.EdgeInsets.symmetric(vertical: 16),
+              width: double.infinity,
+              child: pw.Column(
+                children: [
+                  pw.Text('Inspection report',
+                      style: pw.TextStyle(
+                        fontSize: 18,
+                        color: PdfColors.white,
+                        fontWeight: pw.FontWeight.bold,
+                      )),
+                  pw.Text('Vigilo prevention program',
+                      style: pw.TextStyle(
+                        fontSize: 12,
+                        color: PdfColors.white,
+                      )),
+                ],
+              ),
+            ),
+
+            pw.SizedBox(height: 20),
+
+            // Centered Logo
+            pw.Center(
+              child: pw.Image(pw.MemoryImage(logo.buffer.asUint8List()), height: 80),
+            ),
+
+            pw.Divider(),
+
+            // Inspection Location
+            pw.Text(
+              "Inspection location",
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 12,
+                decoration: pw.TextDecoration.underline,
+              ),
+              textAlign: pw.TextAlign.center,
+            ),
+            pw.SizedBox(height: 5),
+            pw.Text(
+              "Syndicat des copropriétaires ${report['apartmentName']} - Unit ${report['apartmentUnit']}",
+              style: const pw.TextStyle(fontSize: 11),
+              textAlign: pw.TextAlign.center,
+            ),
+            pw.SizedBox(height: 20),
+
+            // Prepared By Section
+            pw.Text(
+              "Prepared by",
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 12,
+                decoration: pw.TextDecoration.underline,
+              ),
+              textAlign: pw.TextAlign.center,
+            ),
+            pw.SizedBox(height: 5),
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Text(
+                  controller.user.value.name.toString(),
+                  textAlign: pw.TextAlign.center,
+                ),
+                pw.Text(
+                  "Montréal",
+                  textAlign: pw.TextAlign.center,
+                ),
+                pw.Text(
+                  "5345 Rang du Bas St-François",
+                  textAlign: pw.TextAlign.center,
+                ),
+                pw.Text(
+                  "Laval, Quebec",
+                  textAlign: pw.TextAlign.center,
+                ),
+                pw.Text(
+                  "H7E 4P2",
+                  textAlign: pw.TextAlign.center,
+                ),
+                pw.Text(
+                  "Tel: (514) 742-5933",
+                  textAlign: pw.TextAlign.center,
+                ),
+                pw.Text(
+                  "RBQ: 5761-8506-01",
+                  textAlign: pw.TextAlign.center,
+                ),
+              ],
+            ),
+
+
+            pw.SizedBox(height: 20),
+            pw.Divider(),
+
+            // Footer
+            pw.SizedBox(height: 50),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text("Inspection date: ${report['inspectionDate'] ?? 'N/A'}",
+                    style: pw.TextStyle(fontSize: 10)),
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  children: [
+                    pw.Text("Report generated by Apartment Inspection",
+                        style: pw.TextStyle(fontSize: 8)),
+                  ],
+                ),
+              ],
+            ),
+
+            pw.SizedBox(height: 20),
+
+            // Room Inspections
+            if (roomWidgets.isNotEmpty)
+              pw.Text("Room Inspections",
+                  style: pw.TextStyle(
+                      fontSize: 14, fontWeight: pw.FontWeight.bold)),
+            ...roomWidgets,
+
+            // Signatures
+            if (techSignature != null || clientSignature != null)
+              pw.SizedBox(height: 20),
+            if (techSignature != null || clientSignature != null)
+              pw.Text("Signatures",
+                  style: pw.TextStyle(
+                      fontSize: 14, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 10),
+            pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                if (techSignature != null)
+                  pw.Column(children: [
+                    pw.Text("Technician:"),
+                    pw.SizedBox(height: 5),
+                    pw.Image(pw.MemoryImage(techSignature), height: 50),
+                  ]),
+                pw.Spacer(),
+                if (clientSignature != null)
+                  pw.Column(children: [
+                    pw.Text("Client:"),
+                    pw.SizedBox(height: 5),
+                    pw.Image(pw.MemoryImage(clientSignature), height: 50),
+                  ]),
+              ],
+            ),
+          ],
+        ),
+      );
+
+      // Save and upload PDF
+      final output = await getTemporaryDirectory();
+      final filePath = "${output.path}/inspection_$reportId.pdf";
+      final file = File(filePath);
+      await file.writeAsBytes(await pdf.save());
+
+      final pdfRef = _storage.ref("pdf_reports/$reportId.pdf");
+      await pdfRef.putFile(file);
+
+      final pdfUrl = await pdfRef.getDownloadURL();
+
+      await _firestore.collection('reports').doc(reportId).update({
+        'pdfUrl': pdfUrl,
+      });
+
+      print("✅ PDF uploaded and URL saved");
+    } catch (e) {
+      print("❌ PDF generation failed: $e");
+    }
+  }
+
+
 }

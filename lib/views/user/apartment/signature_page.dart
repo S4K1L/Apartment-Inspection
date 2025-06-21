@@ -132,18 +132,21 @@ class _SignaturePageState extends State<SignaturePage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "Date de validation de la visite",
+                      "You can also send PDF to Client",
                       style: TextStyle(
                           fontSize: 18.sp,
                           fontWeight: FontWeight.w500,
-                          color: kBlackColor),
+                          color: kBlackColor,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      "Date of validation of the visit",
+                      "Property Manager will get the pdf automatically",
                       style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w300,
                           color: kGreyColor),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 );
@@ -153,8 +156,8 @@ class _SignaturePageState extends State<SignaturePage> {
         padding: const EdgeInsets.all(8.0),
         child: FinishedButton(
           onPress: handleSubmit,
-          title: "FAITE",
-          icon: Icons.sign_language,
+          title: "Generate",
+          icon: Icons.picture_as_pdf,
         ),
       ),
     );

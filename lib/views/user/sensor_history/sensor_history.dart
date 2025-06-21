@@ -4,16 +4,16 @@ import 'package:apartmentinspection/controller/apartment_controller.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
 import 'package:apartmentinspection/utils/theme/colors.dart';
 import 'package:apartmentinspection/views/user/create_apartment/create_apartment.dart';
-import 'package:apartmentinspection/views/user/home/unit_list.dart';
+import 'package:apartmentinspection/views/user/sensor_history/sensor_history_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 
-class HomePage extends StatelessWidget {
+class SensorHistoryPage extends StatelessWidget {
   final ApartmentController controller = Get.put(ApartmentController());
 
-  HomePage({super.key});
+  SensorHistoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class HomePage extends StatelessWidget {
           SizedBox(width: 8.sp),
           Image.asset(Const.logo),
           SizedBox(width: 8.sp),
-          Text("APARTMENT",
+          Text("Sensor History",
               style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold)),
           const Spacer(),
           Image.asset(Const.bar, height: 26.sp),
@@ -58,7 +58,7 @@ class HomePage extends StatelessWidget {
                         final apartment = controller.apartmentList[index];
                         return GestureDetector(
                           onTap: (){
-                            Get.to(()=> UnitListPage(apartmentName: apartment),transition: Transition.rightToLeft);
+                            Get.to(()=> SensorHistoryList(apartmentName: apartment),transition: Transition.rightToLeft);
                           },
                           child: Container(
                             margin: const EdgeInsets.symmetric(vertical: 10),
@@ -161,22 +161,6 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ],
-      ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: kPrimaryColor,
-        ),
-        child: IconButton(
-          onPressed: () {
-            Get.to(() => CreateSensorPage(), transition: Transition.rightToLeft);
-          },
-          icon: const Icon(
-            Icons.add,
-            color: kWhiteColor,
-            size: 32,
-          ),
-        ),
       ),
     );
   }

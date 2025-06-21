@@ -5,8 +5,9 @@ import 'package:apartmentinspection/views/user/report.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../user/battery_history/battery_history_page.dart';
 import '../user/sensor/sensor.dart';
+import '../user/sensor_history/sensor_history.dart';
+
 
 class UserCustomBottomBar extends StatefulWidget {
   const UserCustomBottomBar({super.key});
@@ -34,7 +35,7 @@ class _BottomBarState extends State<UserCustomBottomBar> {
         height: 60.sp,
         child: Row(
           children: [
-            _buildBottomNavigationItem(CupertinoIcons.battery_full, 1, "Battery"),
+            _buildBottomNavigationItem(CupertinoIcons.battery_full, 1, "Sensor"),
             _buildBottomNavigationItem(Icons.history_toggle_off, 2, "History"),
             _buildBottomNavigationItem(Icons.home, 0, "Home"),
             _buildBottomNavigationItem(Icons.dynamic_feed, 3, "Report"),

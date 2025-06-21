@@ -79,9 +79,9 @@ class _UnitListPageState extends State<UnitListPage> {
                       backgroundColor: Colors.white,
                       child: ListView.builder(
                         padding: const EdgeInsets.all(16),
-                        itemCount: controller.filteredList.length, // ✅ use filteredList
+                        itemCount: controller.filteredList.length,
                         itemBuilder: (context, index) {
-                          final apartment = controller.filteredList[index]; // ✅ use filteredList
+                          final apartment = controller.filteredList[index];
                           return ApartmentCard(
                             number: apartment.apartmentNumber,
                             unit: apartment.apartmentUnit,

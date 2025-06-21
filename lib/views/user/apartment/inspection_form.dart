@@ -66,9 +66,9 @@ class InspectionFormPage extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: Padding(
+      floatingActionButton: Obx(()=>Padding(
         padding: const EdgeInsets.all(8.0),
-        child: FinishedButton(
+        child: controller.isLoading.value ? CircularProgressIndicator() : FinishedButton(
           onPress: () {
             controller.addRoomEntry(
               roomName,
@@ -77,12 +77,11 @@ class InspectionFormPage extends StatelessWidget {
               apartmentName: apartmentName,
               checkingName: checkingName,
             );
-            Get.back();
           },
-          title: "Submit",
+          title:  "Submit",
           icon: Icons.drive_folder_upload_outlined,
         ),
-      ),
+      ),),
     );
   }
 
