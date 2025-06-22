@@ -155,7 +155,7 @@ Any disputes shall be resolved under the jurisdiction of our operational headqua
 7. **Amendments**
 These terms may be updated periodically. Continued use of the platform constitutes acceptance of the updated terms.
 
-If you have any questions or concerns regarding these terms, please contact us at support@apartmentinspection.com.
+If you have any questions or concerns regarding these terms, please contact us at apartmentinspection@gmail.com.
 
 Thank you for trusting Apartment Inspection.
             ''',

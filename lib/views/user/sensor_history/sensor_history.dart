@@ -3,7 +3,6 @@ import 'package:animate_do/animate_do.dart';
 import 'package:apartmentinspection/controller/apartment_controller.dart';
 import 'package:apartmentinspection/utils/constant/const.dart';
 import 'package:apartmentinspection/utils/theme/colors.dart';
-import 'package:apartmentinspection/views/user/create_apartment/create_apartment.dart';
 import 'package:apartmentinspection/views/user/sensor_history/sensor_history_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

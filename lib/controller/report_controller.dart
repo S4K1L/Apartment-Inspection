@@ -13,7 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 
 class ReportController extends GetxController {
-  final controller = Get.put(LoginController());
+  final LoginController loginController = Get.put(LoginController());
   final reports = [].obs;
   final isLoading = false.obs;
   final _firestore = FirebaseFirestore.instance;
@@ -41,20 +41,22 @@ class ReportController extends GetxController {
 
   Future<Uint8List> generatePdf(Map<String, dynamic> report) async {
     final pdf = pw.Document();
-
     final fontData = await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
     final ttf = pw.Font.ttf(fontData);
     final logo = await rootBundle.load(Const.logo);
 
+    // Safely get user name
+    final userName = loginController.user.value.name?.toString() ?? 'Technician';
+
+    // Load signatures
     Uint8List? techSignature;
     Uint8List? clientSignature;
     if (report['signatures'] != null) {
-      techSignature =
-      await networkImageToBytes(report['signatures']['technician']);
-      clientSignature =
-      await networkImageToBytes(report['signatures']['client']);
+      techSignature = await networkImageToBytes(report['signatures']['technician']);
+      clientSignature = await networkImageToBytes(report['signatures']['client']);
     }
 
+    // Room entries
     final roomWidgets = <pw.Widget>[];
     for (var room in report['rooms']) {
       final entryWidgets = <pw.Widget>[];
@@ -75,10 +77,14 @@ class ReportController extends GetxController {
               children: [
                 pw.Expanded(
                   child: pw.Text(
-                    'Checking: ${entry['checkingName'] ?? ''}\nLevel: ${entry['interventionLevel'] ?? ''}\nComment: ${entry['comment'] ?? ''}',
+                    '• Inspection Point: ${entry['checkingName'] ?? 'N/A'}\n'
+                        '  Severity Level: ${entry['interventionLevel'] ?? 'N/A'}\n'
+                        '  Comment: ${entry['comment'] ?? 'N/A'}',
                     style: const pw.TextStyle(fontSize: 10),
                   ),
                 ),
+                if (imageBytes != null)
+                  pw.SizedBox(width: 10),
                 if (imageBytes != null)
                   pw.Image(pw.MemoryImage(imageBytes), height: 100, width: 100),
               ],
@@ -99,7 +105,9 @@ class ReportController extends GetxController {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text(room['roomName'],
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                  style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold, fontSize: 12)),
+              pw.SizedBox(height: 4),
               ...entryWidgets,
             ],
           ),
@@ -107,6 +115,7 @@ class ReportController extends GetxController {
       );
     }
 
+    // Build PDF
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
@@ -119,13 +128,13 @@ class ReportController extends GetxController {
             width: double.infinity,
             child: pw.Column(
               children: [
-                pw.Text('Inspection report',
+                pw.Text('INSPECTION REPORT',
                     style: pw.TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       color: PdfColors.white,
                       fontWeight: pw.FontWeight.bold,
                     )),
-                pw.Text('Vigilo prevention program',
+                pw.Text('Vigilo Prevention Program',
                     style: pw.TextStyle(
                       fontSize: 12,
                       color: PdfColors.white,
@@ -136,101 +145,112 @@ class ReportController extends GetxController {
 
           pw.SizedBox(height: 20),
 
-          // Centered Logo
+          // Logo
           pw.Center(
             child: pw.Image(pw.MemoryImage(logo.buffer.asUint8List()), height: 80),
           ),
 
           pw.Divider(),
 
-          // Inspection Location
-          pw.Text("Inspection location",
-              style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 12,
-                  decoration: pw.TextDecoration.underline),
-              textAlign: pw.TextAlign.center),
-          pw.SizedBox(height: 5),
-          pw.Text("Syndicat des copropriétaires ${report['apartmentName']} - Unit ${report['apartmentUnit']}",
-              style: const pw.TextStyle(fontSize: 11),
-              textAlign: pw.TextAlign.center),
+          pw.Center(
+            child: pw.Column(
+              children: [
+                // Location Section
+                pw.Text("INSPECTION LOCATION",
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: 13,
+                      decoration: pw.TextDecoration.underline,
+                    ),
+                    textAlign: pw.TextAlign.center),
+                pw.SizedBox(height: 5),
+                pw.Text(
+                  "Syndicat des copropriétaires ${report['apartmentName']} - Unit ${report['apartmentUnit']}",
+                  style: const pw.TextStyle(fontSize: 11),
+                  textAlign: pw.TextAlign.center,
+                ),
 
-          pw.SizedBox(height: 20),
+                pw.SizedBox(height: 25),
 
-          // Prepared By Section
-          pw.Text("Prepared by",
-              style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 12,
-                  decoration: pw.TextDecoration.underline),
-              textAlign: pw.TextAlign.center),
-          pw.SizedBox(height: 5),
-          pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.center,
-            children: [
-              pw.Text(controller.user.value.name.toString()),
-              pw.Text("Montréal"),
-              pw.Text("5345 Rang du Bas St-François"),
-              pw.Text("Laval, Quebec"),
-              pw.Text("H7E 4P2"),
-              pw.Text("Tel: (514) 742-5933"),
-              pw.Text("RBQ: 5761-8506-01"),
-            ],
+                // Prepared By Section - Centered
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  children: [
+                    pw.Text("PREPARED BY",
+                        style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 13,
+                          decoration: pw.TextDecoration.underline,
+                        )),
+                    pw.SizedBox(height: 10),
+                    pw.Text(userName, style: pw.TextStyle(fontSize: 11)),
+                    pw.Text("Montréal"),
+                    pw.Text("5345 Rang du Bas St-François"),
+                    pw.Text("Laval, Quebec, H7E 4P2"),
+                    pw.Text("Tel: (514) 742-5933"),
+                    pw.Text("RBQ License: 5761-8506-01"),
+                  ],
+                ),
+              ]
+            )
           ),
 
-          pw.SizedBox(height: 20),
           pw.Divider(),
 
-          // Footer
-          pw.SizedBox(height: 50),
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text("Inspection date: ${report['inspectionDate'] ?? 'N/A'}",
-                  style: pw.TextStyle(fontSize: 10)),
-              pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.end,
-                children: [
-                  pw.Text("Report generated by TrackandFix.com",
-                      style: pw.TextStyle(fontSize: 8)),
-                ],
-              ),
-            ],
-          ),
-
-          pw.SizedBox(height: 20),
+          pw.SizedBox(height: 25),
 
           // Room Inspections
           if (roomWidgets.isNotEmpty)
-            pw.Text("Room Inspections",
+            pw.Text("ROOM INSPECTIONS",
                 style: pw.TextStyle(
-                    fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                  fontSize: 13,
+                  fontWeight: pw.FontWeight.bold,
+                  decoration: pw.TextDecoration.underline,
+                )),
+          pw.SizedBox(height: 10),
           ...roomWidgets,
 
-          // Signatures
+          // Signatures Section
           if (techSignature != null || clientSignature != null)
-            pw.SizedBox(height: 20),
+            pw.SizedBox(height: 30),
           if (techSignature != null || clientSignature != null)
-            pw.Text("Signatures",
+            pw.Text("SIGNATURES",
                 style: pw.TextStyle(
-                    fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                  fontSize: 13,
+                  fontWeight: pw.FontWeight.bold,
+                  decoration: pw.TextDecoration.underline,
+                )),
           pw.SizedBox(height: 10),
           pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
               if (techSignature != null)
-                pw.Column(children: [
-                  pw.Text("Technician:"),
-                  pw.SizedBox(height: 5),
-                  pw.Image(pw.MemoryImage(techSignature), height: 50),
-                ]),
-              pw.Spacer(),
+                pw.Column(
+                  children: [
+                    pw.Text("Technician"),
+                    pw.SizedBox(height: 5),
+                    pw.Image(pw.MemoryImage(techSignature), height: 50),
+                  ],
+                ),
               if (clientSignature != null)
-                pw.Column(children: [
-                  pw.Text("Client:"),
-                  pw.SizedBox(height: 5),
-                  pw.Image(pw.MemoryImage(clientSignature), height: 50),
-                ]),
+                pw.Column(
+                  children: [
+                    pw.Text("Client"),
+                    pw.SizedBox(height: 5),
+                    pw.Image(pw.MemoryImage(clientSignature), height: 50),
+                  ],
+                ),
+            ],
+          ),
+          // Footer Date
+          pw.SizedBox(height: 30),
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text("Inspection Date: ${report['inspectionDate'] ?? 'N/A'}",
+                  style: const pw.TextStyle(fontSize: 10)),
+              pw.Text("Generated by Apartment Inspection",
+                  style: const pw.TextStyle(fontSize: 8)),
             ],
           ),
         ],
@@ -240,24 +260,6 @@ class ReportController extends GetxController {
     return pdf.save();
   }
 
-
-// Helper for info blocks
-  pw.Widget _infoCard(String title, String value) {
-    return pw.Container(
-      margin: const pw.EdgeInsets.only(bottom: 6),
-      child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Text(title,
-              style: pw.TextStyle(
-                  fontSize: 10,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.blueGrey800)),
-          pw.Text(value, style: const pw.TextStyle(fontSize: 10)),
-        ],
-      ),
-    );
-  }
 
   // Search function
   void searchReports(String query) {
@@ -287,31 +289,6 @@ class ReportController extends GetxController {
     }
   }
 
-// Schedule Table
-  pw.Widget _scheduleTable(List<dynamic>? schedule) {
-    if (schedule == null) return pw.SizedBox();
-    return pw.Table.fromTextArray(
-      headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
-      cellStyle: const pw.TextStyle(fontSize: 9),
-      headers: ['Stage', 'Due Date'],
-      data: schedule.map((e) => [e['stage'], e['due']]).toList(),
-      border: pw.TableBorder.all(color: PdfColors.grey400),
-      cellAlignment: pw.Alignment.centerLeft,
-    );
-  }
-
-// Time Table
-  pw.Widget _timeTable(List<dynamic>? timeEstimates) {
-    if (timeEstimates == null) return pw.SizedBox();
-    return pw.Table.fromTextArray(
-      headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
-      cellStyle: const pw.TextStyle(fontSize: 9),
-      headers: ['Task', 'Hours'],
-      data: timeEstimates.map((e) => [e['task'], e['hours']]).toList(),
-      border: pw.TableBorder.all(color: PdfColors.grey400),
-      cellAlignment: pw.Alignment.centerLeft,
-    );
-  }
 
   Future<Uint8List> networkImageToBytes(String url) async {
     final response = await http.get(Uri.parse(url));

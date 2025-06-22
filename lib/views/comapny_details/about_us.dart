@@ -24,7 +24,7 @@ class AboutUsPage extends StatelessWidget {
             )),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text("About Us"),
+        title: Text("About Us",style: TextStyle(color: kWhiteColor,fontWeight: FontWeight.bold),),
         centerTitle: true,
       ),
       body: Stack(

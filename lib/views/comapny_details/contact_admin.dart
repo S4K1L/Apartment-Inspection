@@ -41,8 +41,6 @@ class ContactUsPage extends StatelessWidget {
                     _glassCard(),
                     SizedBox(height: 20.h),
                     _adminContactInfo(),
-                    SizedBox(height: 20.h),
-                    _contactForm(),
                   ],
                 ),
               ),
@@ -142,7 +140,7 @@ class ContactUsPage extends StatelessWidget {
             children: [
               const Icon(Icons.email, color: Colors.teal),
               SizedBox(width: 10.w),
-              Text("support@apartmentinspection.com",
+              Text("apartmentinspection@gmail.com",
                   style: TextStyle(fontSize: 14.sp)),
             ],
           ),
@@ -151,7 +149,7 @@ class ContactUsPage extends StatelessWidget {
             children: [
               const Icon(Icons.phone, color: Colors.teal),
               SizedBox(width: 10.w),
-              Text("+1 (800) 123-4567", style: TextStyle(fontSize: 14.sp)),
+              Text("(514) 742-5933", style: TextStyle(fontSize: 14.sp)),
             ],
           ),
           SizedBox(height: 10.h),
@@ -160,7 +158,7 @@ class ContactUsPage extends StatelessWidget {
               const Icon(Icons.location_on, color: Colors.teal),
               SizedBox(width: 10.w),
               Text(
-                "1234 Smart Street, Silicon Valley, CA 94043",
+                "Montréal,\n5345 Rang du Bas St-François,\nLaval, Quebec, H7E 4P2",
                 style: TextStyle(fontSize: 14.sp),
               ),
             ],

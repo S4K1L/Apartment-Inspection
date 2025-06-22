@@ -1,0 +1,2 @@
+C:/Users/SiRUSsir/StudioProjects/Apartment-Inspection/android/app/.cxx/RelWithDebInfo/z3a366r2/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/SiRUSsir/StudioProjects/Apartment-Inspection/android/app/.cxx/RelWithDebInfo/z3a366r2/armeabi-v7a/CMakeFiles/rebuild_cache.dir

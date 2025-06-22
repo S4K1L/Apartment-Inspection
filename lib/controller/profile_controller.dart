@@ -144,9 +144,8 @@ class ProfileController extends GetxController {
 
     try {
       final reportsSnapshot = await _firestore
-          .collection('users')
-          .doc(userId)
           .collection('reports')
+          .where('inspectedBy', isEqualTo:  userId)
           .get();
 
       return reportsSnapshot.size;

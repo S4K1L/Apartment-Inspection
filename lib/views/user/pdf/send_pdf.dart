@@ -21,7 +21,7 @@ class SendPdfPage extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: kPrimaryColor,
-        title: const Text("Send PDF Report"),
+        title: Text("Send PDF Report",style: TextStyle(color: kWhiteColor),),
         centerTitle: true,
       ),
       body: Center(
@@ -95,7 +95,7 @@ class SendPdfPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                      : const Text("Send Email"),
+                      : const Text("Send Email",style: TextStyle(color: kWhiteColor),),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPrimaryColor,
                     padding: EdgeInsets.symmetric(
