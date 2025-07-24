@@ -3,7 +3,6 @@ import 'package:apartmentinspection/utils/constant/const.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:http/http.dart' as http;
@@ -12,31 +11,88 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/widgets/report_card_widget.dart';
+
 class ReportController extends GetxController {
   final LoginController loginController = Get.put(LoginController());
   final reports = [].obs;
+  var originalReports = <Map<String, dynamic>>[];
   final isLoading = false.obs;
   final _firestore = FirebaseFirestore.instance;
-  final _auth = FirebaseAuth.instance;
+  var selectedMonth = 0.obs;
+  var selectedYear = 0.obs;
 
-  Future<void> fetchReports() async {
-    isLoading.value = true;
+  @override
+  void onInit() {
+    super.onInit();
+    fetchAllReports();
+  }
+
+  void fetchAllReports() async {
     try {
-      final user = _auth.currentUser;
-      if (user == null) throw "No logged in user";
-
-      final query = await _firestore
+      isLoading.value = true;
+      final snapshot = await _firestore
           .collection('reports')
-          .where('inspectedBy', isEqualTo: user.uid)
           .orderBy('createdAt', descending: true)
           .get();
 
-      reports.value = query.docs.map((doc) => doc.data()).toList();
+      originalReports = snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList();
+
+      reports.assignAll(originalReports);
     } catch (e) {
       Get.snackbar("Error", "Failed to fetch reports: $e");
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void filterReportsByMonthYear(int month, int year) {
+    selectedMonth.value = month;
+    selectedYear.value = year;
+
+    reports.assignAll(originalReports.where((report) {
+      final createdAt = report['createdAt'];
+      if (createdAt is Timestamp) {
+        final date = createdAt.toDate();
+        return date.month == month && date.year == year;
+      }
+      return false;
+    }).toList());
+  }
+
+  void searchReports(String query) {
+    final lowerQuery = query.toLowerCase();
+    reports.assignAll(originalReports.where((report) {
+      final aptNumber = (report['apartmentNumber'] ?? '').toString().toLowerCase();
+      final aptUnit = (report['apartmentUnit'] ?? '').toString().toLowerCase();
+      final aptName = (report['apartmentName'] ?? '').toString().toLowerCase();
+
+      final createdAt = report['createdAt'];
+      final date = createdAt is Timestamp ? createdAt.toDate() : null;
+
+      final monthYearMatch = selectedMonth.value == 0 || selectedYear.value == 0
+          ? true
+          : (date != null && date.month == selectedMonth.value && date.year == selectedYear.value);
+
+      return monthYearMatch &&
+          (aptNumber.contains(lowerQuery) ||
+              aptUnit.contains(lowerQuery) ||
+              aptName.contains(lowerQuery));
+    }).toList());
+  }
+
+  Widget buildReportCard(Map<String, dynamic> report) {
+    return ReportCardWidget(report: report);
+  }
+
+  void updateMonthYear(int month, int year) {
+    selectedMonth.value = month;
+    selectedYear.value = year;
+    filterReportsByMonthYear(month, year);
   }
 
   Future<Uint8List> generatePdf(Map<String, dynamic> report) async {
@@ -261,29 +317,12 @@ class ReportController extends GetxController {
   }
 
 
-  // Search function
-  void searchReports(String query) {
-    if (query.isEmpty) {
-      reports.value = List.from(reports);
-    } else {
-      reports.value = reports.where((report) {
-        final apartment = report['apartmentNumber'].toString().toLowerCase();
-        final apartmentName = report['apartmentName'].toString().toLowerCase();
-        final unit = report['apartmentUnit'].toString().toLowerCase();
-        final search = query.toLowerCase();
-
-        return apartmentName.contains(search) ||
-            apartment.contains(search) ||
-            unit.contains(search);
-      }).toList();
-    }
-  }
 
 //delete
   Future<void> deleteReport(String id) async {
     try {
       await _firestore.collection('reports').doc(id).delete();
-      fetchReports(); // Refresh list after deletion
+      fetchAllReports(); // Refresh list after deletion
     } catch (e) {
       Get.snackbar("Error", "Failed to delete report");
     }

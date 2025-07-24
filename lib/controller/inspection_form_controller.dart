@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:signature/signature.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
@@ -100,6 +101,9 @@ class InspectionFormController extends GetxController {
 
     try {
       isLoading.value = true;
+      final now = DateTime.now();
+      final startOfMonth = DateTime(now.year, now.month, 1);
+      final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
       final imageToUpload =
           selectedImages.isNotEmpty ? selectedImages.first : null;
@@ -116,6 +120,8 @@ class InspectionFormController extends GetxController {
           .collection('reports')
           .where('apartmentNumber', isEqualTo: apartmentNumber)
           .where('apartmentUnit', isEqualTo: apartmentUnit)
+          .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+          .where('createdAt', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
           .limit(1)
           .get();
 
@@ -192,6 +198,9 @@ class InspectionFormController extends GetxController {
 
     try {
       isLoading.value = true;
+      final now = DateTime.now();
+      final startOfMonth = DateTime(now.year, now.month, 1);
+      final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
       final newRoomList = roomEntries.entries.map((entry) {
         return {
@@ -204,6 +213,8 @@ class InspectionFormController extends GetxController {
           .collection('reports')
           .where('apartmentNumber', isEqualTo: apartmentNumber)
           .where('apartmentUnit', isEqualTo: apartmentUnit)
+          .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+          .where('createdAt', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
           .limit(1)
           .get();
 
@@ -285,9 +296,9 @@ class InspectionFormController extends GetxController {
           .where('apartmentNumber', isEqualTo: apartmentNumber)
           .where('apartmentUnit', isEqualTo: apartmentUnit)
           .where('createdAt',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
           .where('createdAt',
-              isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
+          isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
           .limit(1)
           .get();
 
@@ -347,6 +358,8 @@ class InspectionFormController extends GetxController {
     }
   }
 
+
+
   Future<Uint8List> networkImageToBytes(String url) async {
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
@@ -365,19 +378,24 @@ class InspectionFormController extends GetxController {
       final pdf = pw.Document();
       final fontData = await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
       final ttf = pw.Font.ttf(fontData);
-
-      // Example simple content (replace with your detailed layout)
       final logo = await rootBundle.load(Const.logo);
 
+      // Safely get user name (using your original controller)
+      final userName = controller.user.value.name?.toString() ?? 'Technician';
+
+      // Load signatures
       Uint8List? techSignature;
       Uint8List? clientSignature;
       if (report['signatures'] != null) {
-        techSignature =
-        await networkImageToBytes(report['signatures']['technician']);
-        clientSignature =
-        await networkImageToBytes(report['signatures']['client']);
+        try {
+          techSignature = await networkImageToBytes(report['signatures']['technician']);
+        } catch (_) {}
+        try {
+          clientSignature = await networkImageToBytes(report['signatures']['client']);
+        } catch (_) {}
       }
 
+      // Process room entries
       final roomWidgets = <pw.Widget>[];
       for (var room in report['rooms']) {
         final entryWidgets = <pw.Widget>[];
@@ -398,10 +416,13 @@ class InspectionFormController extends GetxController {
                 children: [
                   pw.Expanded(
                     child: pw.Text(
-                      'Checking: ${entry['checkingName'] ?? ''}\nLevel: ${entry['interventionLevel'] ?? ''}\nComment: ${entry['comment'] ?? ''}',
+                      '• Inspection Point: ${entry['checkingName'] ?? 'N/A'}\n'
+                          '  Severity Level: ${entry['interventionLevel'] ?? 'N/A'}\n'
+                          '  Comment: ${entry['comment'] ?? 'N/A'}',
                       style: const pw.TextStyle(fontSize: 10),
                     ),
                   ),
+                  if (imageBytes != null) pw.SizedBox(width: 10),
                   if (imageBytes != null)
                     pw.Image(pw.MemoryImage(imageBytes), height: 100, width: 100),
                 ],
@@ -421,8 +442,14 @@ class InspectionFormController extends GetxController {
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text(room['roomName'],
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                pw.Text(
+                  room['roomName'],
+                  style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+                pw.SizedBox(height: 4),
                 ...entryWidgets,
               ],
             ),
@@ -430,6 +457,7 @@ class InspectionFormController extends GetxController {
         );
       }
 
+      // Build PDF with updated UI
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
@@ -442,147 +470,140 @@ class InspectionFormController extends GetxController {
               width: double.infinity,
               child: pw.Column(
                 children: [
-                  pw.Text('Inspection report',
-                      style: pw.TextStyle(
-                        fontSize: 18,
-                        color: PdfColors.white,
-                        fontWeight: pw.FontWeight.bold,
-                      )),
-                  pw.Text('Vigilo prevention program',
-                      style: pw.TextStyle(
-                        fontSize: 12,
-                        color: PdfColors.white,
-                      )),
+                  pw.Text(
+                    'INSPECTION REPORT',
+                    style: pw.TextStyle(
+                      fontSize: 20,
+                      color: PdfColors.white,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.Text(
+                    'Vigilo Prevention Program',
+                    style: pw.TextStyle(
+                      fontSize: 12,
+                      color: PdfColors.white,
+                    ),
+                  ),
                 ],
               ),
             ),
-
             pw.SizedBox(height: 20),
 
-            // Centered Logo
+            // Logo
             pw.Center(
               child: pw.Image(pw.MemoryImage(logo.buffer.asUint8List()), height: 80),
             ),
-
             pw.Divider(),
 
-            // Inspection Location
-            pw.Text(
-              "Inspection location",
-              style: pw.TextStyle(
-                fontWeight: pw.FontWeight.bold,
-                fontSize: 12,
-                decoration: pw.TextDecoration.underline,
+            // Inspection Location & Prepared By Section
+            pw.Center(
+              child: pw.Column(
+                children: [
+                  // Location Section
+                  pw.Text(
+                    "INSPECTION LOCATION",
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: 13,
+                      decoration: pw.TextDecoration.underline,
+                    ),
+                    textAlign: pw.TextAlign.center,
+                  ),
+                  pw.SizedBox(height: 5),
+                  pw.Text(
+                    "Syndicat des copropriétaires ${report['apartmentName']} - Unit ${report['apartmentUnit']}",
+                    style: const pw.TextStyle(fontSize: 11),
+                    textAlign: pw.TextAlign.center,
+                  ),
+                  pw.SizedBox(height: 25),
+
+                  // Prepared By Section - Centered
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text(
+                        "PREPARED BY",
+                        style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 13,
+                          decoration: pw.TextDecoration.underline,
+                        ),
+                      ),
+                      pw.SizedBox(height: 10),
+                      pw.Text(userName, style: pw.TextStyle(fontSize: 11)),
+                      pw.Text("Montréal"),
+                      pw.Text("5345 Rang du Bas St-François"),
+                      pw.Text("Laval, Quebec, H7E 4P2"),
+                      pw.Text("Tel: (514) 742-5933"),
+                      pw.Text("RBQ License: 5761-8506-01"),
+                    ],
+                  ),
+                ],
               ),
-              textAlign: pw.TextAlign.center,
             ),
-            pw.SizedBox(height: 5),
-            pw.Text(
-              "Syndicat des copropriétaires ${report['apartmentName']} - Unit ${report['apartmentUnit']}",
-              style: const pw.TextStyle(fontSize: 11),
-              textAlign: pw.TextAlign.center,
-            ),
-            pw.SizedBox(height: 20),
-
-            // Prepared By Section
-            pw.Text(
-              "Prepared by",
-              style: pw.TextStyle(
-                fontWeight: pw.FontWeight.bold,
-                fontSize: 12,
-                decoration: pw.TextDecoration.underline,
-              ),
-              textAlign: pw.TextAlign.center,
-            ),
-            pw.SizedBox(height: 5),
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
-                pw.Text(
-                  controller.user.value.name.toString(),
-                  textAlign: pw.TextAlign.center,
-                ),
-                pw.Text(
-                  "Montréal",
-                  textAlign: pw.TextAlign.center,
-                ),
-                pw.Text(
-                  "5345 Rang du Bas St-François",
-                  textAlign: pw.TextAlign.center,
-                ),
-                pw.Text(
-                  "Laval, Quebec",
-                  textAlign: pw.TextAlign.center,
-                ),
-                pw.Text(
-                  "H7E 4P2",
-                  textAlign: pw.TextAlign.center,
-                ),
-                pw.Text(
-                  "Tel: (514) 742-5933",
-                  textAlign: pw.TextAlign.center,
-                ),
-                pw.Text(
-                  "RBQ: 5761-8506-01",
-                  textAlign: pw.TextAlign.center,
-                ),
-              ],
-            ),
-
-
-            pw.SizedBox(height: 20),
             pw.Divider(),
-
-            // Footer
-            pw.SizedBox(height: 50),
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Text("Inspection date: ${report['inspectionDate'] ?? 'N/A'}",
-                    style: pw.TextStyle(fontSize: 10)),
-                pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.end,
-                  children: [
-                    pw.Text("Report generated by Apartment Inspection",
-                        style: pw.TextStyle(fontSize: 8)),
-                  ],
-                ),
-              ],
-            ),
-
-            pw.SizedBox(height: 20),
+            pw.SizedBox(height: 25),
 
             // Room Inspections
             if (roomWidgets.isNotEmpty)
-              pw.Text("Room Inspections",
-                  style: pw.TextStyle(
-                      fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                "ROOM INSPECTIONS",
+                style: pw.TextStyle(
+                  fontSize: 13,
+                  fontWeight: pw.FontWeight.bold,
+                  decoration: pw.TextDecoration.underline,
+                ),
+              ),
+            pw.SizedBox(height: 10),
             ...roomWidgets,
 
-            // Signatures
+            // Signatures Section
+            if (techSignature != null || clientSignature != null) pw.SizedBox(height: 30),
             if (techSignature != null || clientSignature != null)
-              pw.SizedBox(height: 20),
-            if (techSignature != null || clientSignature != null)
-              pw.Text("Signatures",
-                  style: pw.TextStyle(
-                      fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                "SIGNATURES",
+                style: pw.TextStyle(
+                  fontSize: 13,
+                  fontWeight: pw.FontWeight.bold,
+                  decoration: pw.TextDecoration.underline,
+                ),
+              ),
             pw.SizedBox(height: 10),
             pw.Row(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
                 if (techSignature != null)
-                  pw.Column(children: [
-                    pw.Text("Technician:"),
-                    pw.SizedBox(height: 5),
-                    pw.Image(pw.MemoryImage(techSignature), height: 50),
-                  ]),
-                pw.Spacer(),
+                  pw.Column(
+                    children: [
+                      pw.Text("Technician"),
+                      pw.SizedBox(height: 5),
+                      pw.Image(pw.MemoryImage(techSignature), height: 50),
+                    ],
+                  ),
                 if (clientSignature != null)
-                  pw.Column(children: [
-                    pw.Text("Client:"),
-                    pw.SizedBox(height: 5),
-                    pw.Image(pw.MemoryImage(clientSignature), height: 50),
-                  ]),
+                  pw.Column(
+                    children: [
+                      pw.Text("Client"),
+                      pw.SizedBox(height: 5),
+                      pw.Image(pw.MemoryImage(clientSignature), height: 50),
+                    ],
+                  ),
+              ],
+            ),
+            // Footer: Inspection Date and Report Generator
+            pw.SizedBox(height: 30),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text(
+                  "Inspection Date: ${report['inspectionDate'] ?? 'N/A'}",
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
+                pw.Text(
+                  "Generated by Apartment Inspection",
+                  style: const pw.TextStyle(fontSize: 8),
+                ),
               ],
             ),
           ],
@@ -609,6 +630,7 @@ class InspectionFormController extends GetxController {
       print("❌ PDF generation failed: $e");
     }
   }
+
 
 
 }
